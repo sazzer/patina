@@ -1,3 +1,3 @@
-pub fn main() {
-  println!("Hello, world!");
+pub async fn main() {
+  println!("Hello, Async world!");
 }
