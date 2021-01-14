@@ -1,5 +1,7 @@
-use actix_web::Responder;
+use super::model::SystemHealthResponse;
+use crate::http::response::Response;
 
-pub async fn check_health() -> impl Responder {
-    "Hello, World!"
+/// Endpoint for checking the health of the system.
+pub async fn check_health() -> Response<SystemHealthResponse> {
+    "".into()
 }

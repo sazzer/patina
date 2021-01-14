@@ -2,6 +2,7 @@
 #![allow(clippy::future_not_send)]
 
 mod health;
+mod http;
 mod server;
 mod service;
 
