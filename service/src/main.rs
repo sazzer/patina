@@ -33,5 +33,6 @@ async fn main() {
     let settings = Settings::default();
     tracing::debug!(settings = ?settings, "Loaded settings");
 
-    patina::main().await;
+    let service = patina::Service::new();
+    service.start(settings.port.unwrap_or(8000)).await;
 }
