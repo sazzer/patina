@@ -315,6 +315,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
+name = "assert2"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96d1e69def1a232bef9759f8cac95b3726f4a674344b0a9f9f1cb1a1cd50e86f"
+dependencies = [
+ "assert2-macros",
+ "yansi",
+]
+
+[[package]]
+name = "assert2-macros"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "715c6964fb35d5714155e9b89347694d4a83916befe700adc4b44cd38b85c0d9"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "rustc_version",
+ "syn",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1177,6 +1199,8 @@ dependencies = [
  "actix-http",
  "actix-rt",
  "actix-web",
+ "assert2",
+ "async-trait",
  "config",
  "dotenv",
  "futures",
@@ -2092,3 +2116,9 @@ checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
  "linked-hash-map 0.5.4",
 ]
+
+[[package]]
+name = "yansi"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fc79f4a1e39857fc00c3f662cbf2651c771f00e9c15fe2abc341806bd46bd71"
