@@ -24,6 +24,7 @@ impl Default for Settings {
         s.try_into().expect("Failed to build settings from config")
     }
 }
+
 #[actix_rt::main]
 async fn main() {
     dotenv().ok();
@@ -33,6 +34,6 @@ async fn main() {
     let settings = Settings::default();
     tracing::debug!(settings = ?settings, "Loaded settings");
 
-    let service = patina::Service::new();
+    let service = patina::Service::new(&patina::Settings {});
     service.start(settings.port.unwrap_or(8000)).await;
 }
