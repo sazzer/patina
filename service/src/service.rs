@@ -16,9 +16,7 @@ impl Service {
         tracing::info!("Building service");
 
         let health = crate::health::config::Component::new();
-        let server = crate::server::config::Component::default()
-            .with_component(health)
-            .build();
+        let server = crate::server::config::Component::default().with_component(health).build();
 
         tracing::info!("Built service");
 

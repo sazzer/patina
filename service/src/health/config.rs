@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
+use actix_web::web::ServiceConfig;
+
 use super::endpoints::configure_server;
 use crate::server::Configurer;
-use actix_web::web::ServiceConfig;
 
 /// Configuration component for the Healthchecks.
 pub struct Component {}

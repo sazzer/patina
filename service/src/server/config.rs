@@ -1,5 +1,6 @@
-use super::{Configurer, Server};
 use std::sync::Arc;
+
+use super::{Configurer, Server};
 
 /// Configuration component for the HTTP Server.
 #[derive(Default)]

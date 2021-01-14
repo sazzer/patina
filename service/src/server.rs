@@ -1,7 +1,8 @@
+use std::sync::Arc;
+
 use actix_cors::Cors;
 use actix_http::http::header;
 use actix_web::{middleware::Logger, web::ServiceConfig, App, HttpServer};
-use std::sync::Arc;
 
 pub mod config;
 

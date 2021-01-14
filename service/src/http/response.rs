@@ -16,15 +16,15 @@ where
     T: Serialize,
 {
     /// The HTTP Status Code
-    pub status: StatusCode,
+    pub status:        StatusCode,
     /// The caching controls
     pub cache_control: Vec<CacheDirective>,
     /// The content type
-    pub content_type: ContentType,
+    pub content_type:  ContentType,
     /// The etag to return, if applicable
-    pub etag: Option<EntityTag>,
+    pub etag:          Option<EntityTag>,
     /// The actual response body
-    pub body: Option<T>,
+    pub body:          Option<T>,
 }
 
 impl<T> Default for Response<T>
@@ -33,11 +33,11 @@ where
 {
     fn default() -> Self {
         Self {
-            status: StatusCode::OK,
+            status:        StatusCode::OK,
             cache_control: vec![CacheDirective::NoCache],
-            content_type: ContentType::json(),
-            etag: None,
-            body: None,
+            content_type:  ContentType::json(),
+            etag:          None,
+            body:          None,
         }
     }
 }
