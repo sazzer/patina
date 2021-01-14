@@ -15,7 +15,10 @@ impl Service {
     pub fn new(_settings: &Settings) -> Self {
         tracing::info!("Building service");
 
-        let server = crate::server::config::Component::default().build();
+        let health = crate::health::config::Component::new();
+        let server = crate::server::config::Component::default()
+            .with_component(health)
+            .build();
 
         tracing::info!("Built service");
 
