@@ -2,5 +2,7 @@
 
 #[actix_rt::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
     patina::main().await;
 }
