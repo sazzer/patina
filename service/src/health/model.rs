@@ -1,5 +1,14 @@
 use std::collections::HashMap;
 
+use async_trait::async_trait;
+
+/// Trait that other components can implement if they can check their health.
+#[async_trait]
+pub trait HealthCheckable: Send + Sync {
+    /// Check the health of the component.
+    async fn check_health(&self) -> Result<(), String>;
+}
+
 /// Representation of the health of a single component.
 #[derive(Debug, PartialEq)]
 pub enum ComponentHealth {

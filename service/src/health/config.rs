@@ -1,17 +1,19 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use actix_web::web::ServiceConfig;
 
-use super::{endpoints::configure_server, service::HealthService, CheckHealthUseCase};
+use super::{endpoints::configure_server, service::HealthService, CheckHealthUseCase, HealthCheckable};
 use crate::server::Configurer;
 
 /// Builder for building the health checks component.
-pub struct Builder {}
+pub struct Builder {
+    components: HashMap<String, Arc<dyn HealthCheckable>>,
+}
 
 impl Builder {
     /// Build the component.
     pub fn build(self) -> Arc<Component> {
-        let service = Arc::new(HealthService::new());
+        let service = Arc::new(HealthService::new(self.components));
         Arc::new(Component { service })
     }
 }
@@ -24,7 +26,7 @@ pub struct Component {
 impl Component {
     /// Provide a builder for building the component.
     pub fn builder() -> Builder {
-        Builder {}
+        Builder { components: HashMap::new() }
     }
 }
 
