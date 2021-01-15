@@ -1,3 +1,5 @@
+pub mod testing;
+
 use crate::server::Server;
 
 /// The actual service layer.

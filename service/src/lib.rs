@@ -6,4 +6,4 @@ mod http;
 mod server;
 mod service;
 
-pub use service::{Service, Settings};
+pub use service::{testing, Service, Settings};
