@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::postgres::Postgres;
+use super::{migrate::migrate, postgres::Postgres};
 
 /// Settings needed for the Database component.
 #[derive(Debug)]
@@ -14,6 +14,7 @@ pub async fn new(settings: &Settings) -> Arc<Postgres> {
     tracing::debug!(settings = ?settings, "Creating database connection");
 
     let database = Postgres::new(&settings.url).await;
+    migrate(&database).await;
 
     Arc::new(database)
 }
