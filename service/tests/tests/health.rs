@@ -13,8 +13,7 @@ async fn check_health_is_successful() {
       "healthy": true,
       "components": {
         "db": {
-          "healthy": true,
-          "message": null
+          "healthy": true
         }
       }
     }
