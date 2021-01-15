@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
 
 use super::Database;
+use crate::health::HealthCheckable;
 
 /// Database connection that works in terms of Postgres.
 pub struct Postgres {
@@ -29,3 +30,14 @@ impl Postgres {
 
 #[async_trait]
 impl Database for Postgres {}
+
+#[async_trait]
+impl HealthCheckable for Postgres {
+    async fn check_health(&self) -> Result<(), String> {
+        let conn = self.pool.get().await.map_err(|e| e.to_string())?;
+
+        conn.simple_query("SELECT 1").await.map_err(|e| e.to_string())?;
+
+        Ok(())
+    }
+}

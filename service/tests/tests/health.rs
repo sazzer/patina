@@ -11,7 +11,12 @@ async fn check_health_is_successful() {
     assert_json_snapshot!(response.to_json().unwrap(), @r###"
     {
       "healthy": true,
-      "components": {}
+      "components": {
+        "db": {
+          "healthy": true,
+          "message": null
+        }
+      }
     }
     "###);
 }

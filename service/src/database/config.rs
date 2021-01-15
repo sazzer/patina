@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{postgres::Postgres, Database};
+use super::postgres::Postgres;
 
 /// Settings needed for the Database component.
 #[derive(Debug)]
@@ -10,7 +10,7 @@ pub struct Settings {
 }
 
 /// Create a new instance of the Database component.
-pub async fn new(settings: &Settings) -> Arc<dyn Database> {
+pub async fn new(settings: &Settings) -> Arc<Postgres> {
     tracing::debug!(settings = ?settings, "Creating database connection");
 
     let database = Postgres::new(&settings.url).await;

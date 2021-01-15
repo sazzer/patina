@@ -11,6 +11,16 @@ pub struct Builder {
 }
 
 impl Builder {
+    /// Register a new component with the health checker.
+    pub fn with_component<S>(mut self, name: S, component: Arc<dyn HealthCheckable>) -> Self
+    where
+        S: Into<String>,
+    {
+        self.components.insert(name.into(), component);
+
+        self
+    }
+
     /// Build the component.
     pub fn build(self) -> Arc<Component> {
         tracing::debug!("Built health service");

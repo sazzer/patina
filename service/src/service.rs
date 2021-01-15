@@ -15,12 +15,11 @@ pub struct Settings {
 
 impl Service {
     /// Create a new instance of the service layer.
-    #[must_use]
     pub async fn new(settings: &Settings) -> Self {
         tracing::info!("Building service");
 
-        let _database = crate::database::config::new(&settings.database).await;
-        let health = crate::health::config::builder().build();
+        let database = crate::database::config::new(&settings.database).await;
+        let health = crate::health::config::builder().with_component("db", database).build();
         let server = crate::server::config::builder().with_component(health).build();
 
         tracing::info!("Built service");
