@@ -16,6 +16,8 @@ impl CheckHealthUseCase for HealthService {
                 Err(msg) => ComponentHealth::Unhealthy(msg),
             };
 
+            tracing::info!(name = ?name, health = ?health, "Component health");
+
             components.insert(name.clone(), health);
         }
 

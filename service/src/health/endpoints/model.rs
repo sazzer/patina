@@ -3,7 +3,10 @@ use std::collections::BTreeMap;
 use actix_http::http::StatusCode;
 use serde::Serialize;
 
-use crate::http::response::Response;
+use crate::{
+    health::{ComponentHealth, SystemHealth},
+    http::response::Response,
+};
 
 /// Reponse model representation of the System Health
 #[derive(Debug, Serialize)]
@@ -19,16 +22,37 @@ pub struct ComponentHealthResponse {
     pub message: Option<String>,
 }
 
-impl From<&str> for Response<SystemHealthResponse> {
-    fn from(_: &str) -> Self {
-        let body = SystemHealthResponse {
-            healthy:    false,
+impl From<ComponentHealth> for ComponentHealthResponse {
+    fn from(health: ComponentHealth) -> Self {
+        match health {
+            ComponentHealth::Healthy => Self {
+                healthy: true,
+                message: None,
+            },
+            ComponentHealth::Unhealthy(msg) => Self {
+                healthy: false,
+                message: Some(msg),
+            },
+        }
+    }
+}
+
+impl From<SystemHealth> for Response<SystemHealthResponse> {
+    fn from(health: SystemHealth) -> Self {
+        let mut body = SystemHealthResponse {
+            healthy:    health.healthy(),
             components: BTreeMap::new(),
         };
 
+        for (name, status) in health.components {
+            body.components.insert(name, status.into());
+        }
+
+        let status = if body.healthy { StatusCode::OK } else { StatusCode::SERVICE_UNAVAILABLE };
+
         Self {
             body: Some(body),
-            status: StatusCode::SERVICE_UNAVAILABLE,
+            status,
             ..Self::default()
         }
     }
