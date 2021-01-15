@@ -9,16 +9,19 @@ pub struct Service {
 
 /// The settings needed to build the service.
 #[derive(Debug)]
-pub struct Settings {}
+pub struct Settings {
+    pub database: crate::database::config::Settings,
+}
 
 impl Service {
     /// Create a new instance of the service layer.
     #[must_use]
-    pub fn new(_settings: &Settings) -> Self {
+    pub async fn new(settings: &Settings) -> Self {
         tracing::info!("Building service");
 
-        let health = crate::health::config::Component::builder().build();
-        let server = crate::server::config::Component::default().with_component(health).build();
+        let _database = crate::database::config::new(&settings.database).await;
+        let health = crate::health::config::builder().build();
+        let server = crate::server::config::builder().with_component(health).build();
 
         tracing::info!("Built service");
 

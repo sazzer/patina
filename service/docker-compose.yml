@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  patina-dev-postgres:
+    image: postgres:12.4-alpine
+    environment:
+      POSTGRES_DB: patina
+      POSTGRES_USER: patina
+      POSTGRES_PASSWORD: patina
+    ports:
+      - "127.0.0.1:45432:5432"

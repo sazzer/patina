@@ -13,6 +13,8 @@ pub struct Builder {
 impl Builder {
     /// Build the component.
     pub fn build(self) -> Arc<Component> {
+        tracing::debug!("Built health service");
+
         let service = Arc::new(HealthService::new(self.components));
         Arc::new(Component { service })
     }
@@ -23,11 +25,11 @@ pub struct Component {
     pub service: Arc<HealthService>,
 }
 
-impl Component {
-    /// Provide a builder for building the component.
-    pub fn builder() -> Builder {
-        Builder { components: HashMap::new() }
-    }
+/// Provide a builder for building the component.
+pub fn builder() -> Builder {
+    tracing::debug!("Building health checks");
+
+    Builder { components: HashMap::new() }
 }
 
 impl Configurer for Component {

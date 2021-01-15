@@ -3,17 +3,23 @@ use patina::testing::TestResponse;
 
 /// Wrapper around the service to test.
 pub struct Service {
-    service:  patina::Service,
+    service: patina::Service,
+
+    #[allow(dead_code)] // TODO: FIX
     database: patina_testdatabase::TestDatabase,
 }
 
 impl Service {
     /// Create a new test service.
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
+        let _ = tracing_subscriber::fmt::try_init();
+
         let database = patina_testdatabase::TestDatabase::default();
 
-        let settings = patina::Settings {};
-        let service = patina::Service::new(&settings);
+        let settings = patina::Settings {
+            database: patina::DatabaseSettings { url: database.url.clone() },
+        };
+        let service = patina::Service::new(&settings).await;
 
         Self { service, database }
     }

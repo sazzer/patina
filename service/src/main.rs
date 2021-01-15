@@ -9,6 +9,9 @@ use serde::Deserialize;
 struct Settings {
     /// The port on which the HTTP server should listen on
     pub port: Option<u16>,
+
+    /// The URL to use to connect to the database
+    pub database_url: String,
 }
 
 impl Default for Settings {
@@ -33,6 +36,9 @@ async fn main() {
     let settings = Settings::default();
     tracing::debug!(settings = ?settings, "Loaded settings");
 
-    let service = patina::Service::new(&patina::Settings {});
+    let service = patina::Service::new(&patina::Settings {
+        database: patina::DatabaseSettings { url: settings.database_url },
+    })
+    .await;
     service.start(settings.port.unwrap_or(8000)).await;
 }

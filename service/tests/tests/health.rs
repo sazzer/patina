@@ -3,7 +3,7 @@ use assert2::check;
 use insta::assert_json_snapshot;
 #[actix_rt::test]
 async fn check_health_is_successful() {
-    let service = crate::Service::new();
+    let service = crate::Service::new().await;
 
     let response = service.inject(TestRequest::get().uri("/health").to_request()).await;
 
