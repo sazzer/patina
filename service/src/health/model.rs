@@ -41,7 +41,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn empty_system_healthy() {
+    fn system_health_given_no_components_is_healthy() {
         let components = HashMap::new();
         let system = SystemHealth { components };
 
@@ -49,7 +49,7 @@ mod tests {
     }
 
     #[test]
-    fn healthy_system_healthy() {
+    fn system_health_given_healthy_components_is_healthy() {
         let mut components = HashMap::new();
         components.insert("healthy".to_string(), ComponentHealth::Healthy);
         let system = SystemHealth { components };
@@ -58,7 +58,7 @@ mod tests {
     }
 
     #[test]
-    fn unhealthy_system_not_healthy() {
+    fn system_health_given_unhealthy_components_is_unhealthy() {
         let mut components = HashMap::new();
         components.insert("unhealthy".to_string(), ComponentHealth::Unhealthy("Oops".to_string()));
         let system = SystemHealth { components };
@@ -67,7 +67,7 @@ mod tests {
     }
 
     #[test]
-    fn mixed_system_not_healthy() {
+    fn system_health_given_mixed_components_is_unhealthy() {
         let mut components = HashMap::new();
         components.insert("healthy".to_string(), ComponentHealth::Healthy);
         components.insert("unhealthy".to_string(), ComponentHealth::Unhealthy("Oops".to_string()));
