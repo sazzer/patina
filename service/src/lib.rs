@@ -6,6 +6,7 @@ mod health;
 mod http;
 mod server;
 mod service;
+mod users;
 
 pub use database::config::Settings as DatabaseSettings;
 pub use service::{testing, Service, Settings};
