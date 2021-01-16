@@ -4,6 +4,7 @@
 mod database;
 mod health;
 mod http;
+mod model;
 mod server;
 mod service;
 mod users;
