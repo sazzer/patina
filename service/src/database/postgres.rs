@@ -9,7 +9,6 @@ use crate::health::HealthCheckable;
 
 /// Database connection that works in terms of Postgres.
 pub struct Postgres {
-    #[allow(dead_code)] // TODO: FIX
     pool: Pool,
 }
 
