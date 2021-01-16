@@ -41,7 +41,7 @@ impl From<SimpleProblemType> for Problem {
 }
 
 pub const NOT_FOUND: SimpleProblemType = SimpleProblemType {
-    problem_type:  "tag:patina/2020:problems/not_found",
-    problem_title: "The requested resource was not found",
+    problem_type:  "https://httpstatuses.com/404",
+    problem_title: "Not Found",
     status_code:   StatusCode::NOT_FOUND,
 };
