@@ -22,6 +22,7 @@ async-trait = "0.1.42"
 rust-embed = "5.8.0"
 uuid = {version = "0.8.2", features = ["v4", "serde"] }
 chrono = { version = "0.4.19", features = ["serde"] }
+thiserror = "1.0.23"
 
 deadpool = "0.5.2"
 deadpool-postgres = "0.5.6"
@@ -31,6 +32,7 @@ tokio-postgres = { version = "0.5.5", features = ["with-uuid-0_8", "with-chrono-
 [dev-dependencies]
 assert2 = "0.3.3"
 insta = "1.5.2"
+test-case = "1.1.0"
 
 patina-testdatabase = { path = './crates/testdatabase'}
 
