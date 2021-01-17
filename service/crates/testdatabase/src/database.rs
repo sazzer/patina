@@ -1,11 +1,11 @@
 use std::str::FromStr;
 
-use crate::seed::SeedData;
-
-use super::postgres::Postgres;
 use deadpool_postgres::{Manager, ManagerConfig, Pool, RecyclingMethod};
 use lazy_static::lazy_static;
 use testcontainers::{clients::Cli, Container, Docker};
+
+use super::postgres::Postgres;
+use crate::seed::SeedData;
 
 lazy_static! {
     static ref DOCKER: Cli = Cli::default();
@@ -14,10 +14,10 @@ lazy_static! {
 /// Wrapper arond a Postgres database container.
 pub struct TestDatabase {
     #[allow(dead_code)]
-    node: Container<'static, Cli, Postgres>,
+    node:     Container<'static, Cli, Postgres>,
     pub host: String,
     pub port: u16,
-    pub url: String,
+    pub url:  String,
 }
 
 impl Default for TestDatabase {
@@ -26,17 +26,12 @@ impl Default for TestDatabase {
         tracing::info!("Starting Postgres database");
         let node = DOCKER.run(Postgres::default());
 
-        let host = "localhost".to_owned();
+        let host = std::env::var("DOCKER_HOSTNAME").unwrap_or_else(|_| "localhost".to_owned());
         let port = node.get_host_port(5432).unwrap();
         let url = format!("postgres://postgres@{}:{}", host, port);
         tracing::info!(url = ?url, "Running postgres");
 
-        Self {
-            node,
-            host,
-            port,
-            url,
-        }
+        Self { node, host, port, url }
     }
 }
 
