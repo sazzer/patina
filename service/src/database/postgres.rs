@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use async_trait::async_trait;
-use deadpool::managed::{Object, PoolError};
+use deadpool::managed::Object;
 use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
 
 use super::Database;
@@ -32,18 +32,18 @@ impl Postgres {
 
 #[async_trait]
 impl Database for Postgres {
-    async fn checkout(
-        &self,
-    ) -> Result<Object<ClientWrapper, tokio_postgres::Error>, PoolError<tokio_postgres::Error>>
-    {
-        self.pool.get().await
+    async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error> {
+        self.pool
+            .get()
+            .await
+            .expect("Failed to get database connection")
     }
 }
 
 #[async_trait]
 impl HealthCheckable for Postgres {
     async fn check_health(&self) -> Result<(), String> {
-        let conn = self.checkout().await.map_err(|e| e.to_string())?;
+        let conn = self.pool.get().await.map_err(|e| e.to_string())?;
 
         conn.simple_query("SELECT 1")
             .await

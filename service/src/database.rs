@@ -3,7 +3,7 @@ mod migrate;
 mod postgres;
 
 use async_trait::async_trait;
-use deadpool::managed::{Object, PoolError};
+use deadpool::managed::Object;
 use deadpool_postgres::ClientWrapper;
 
 /// Wrapper around the database connection.
@@ -16,7 +16,5 @@ pub trait Database: Send + Sync {
     ///
     /// # Errors
     /// If the pool is unable to return a viable connection
-    async fn checkout(
-        &self,
-    ) -> Result<Object<ClientWrapper, tokio_postgres::Error>, PoolError<tokio_postgres::Error>>;
+    async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error>;
 }

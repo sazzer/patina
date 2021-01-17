@@ -14,7 +14,7 @@ struct Migrations;
 /// # Parameters
 /// - `d` - The database to migrate
 pub async fn migrate(d: &dyn Database) {
-    let mut conn = d.checkout().await.expect("Failed to get connection");
+    let mut conn = d.checkout().await;
     let tx = conn
         .build_transaction()
         .isolation_level(IsolationLevel::Serializable)

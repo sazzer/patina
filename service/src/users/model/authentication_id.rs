@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// The identity of the user at the authentication service.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AuthenticationId(String);
 
 /// Errors that can occur when parsing an string into an `AuthenticationId`.

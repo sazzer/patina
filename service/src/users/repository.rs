@@ -1,3 +1,6 @@
+mod get;
+mod model;
+
 use std::sync::Arc;
 
 use crate::database::Database;

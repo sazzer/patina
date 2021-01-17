@@ -1,11 +1,13 @@
 use std::str::FromStr;
 
+use bytes::BytesMut;
+use postgres_types::{accepts, to_sql_checked, FromSql, IsNull, ToSql, Type};
 use uuid::Uuid;
 
 use crate::http::hal::Link;
 
 /// The ID of a user.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, FromSql)]
 pub struct UserID(Uuid);
 
 impl Default for UserID {
@@ -19,6 +21,21 @@ impl From<UserID> for Link {
         Self::from(format!("/users/{}", value.0))
     }
 }
+
+impl ToSql for UserID {
+    accepts!(UUID);
+
+    to_sql_checked!();
+
+    fn to_sql(
+        &self,
+        t: &Type,
+        w: &mut BytesMut,
+    ) -> Result<IsNull, Box<dyn std::error::Error + Sync + Send>> {
+        self.0.to_sql(t, w)
+    }
+}
+
 /// Errors that can occur when parsing an string into an `UserID`.
 #[derive(Debug, PartialEq, thiserror::Error)]
 pub enum ParseUserIDError {

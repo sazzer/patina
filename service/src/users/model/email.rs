@@ -1,9 +1,11 @@
 use std::str::FromStr;
 
+use bytes::BytesMut;
+use postgres_types::{accepts, to_sql_checked, FromSql, IsNull, ToSql, Type};
 use serde::Serialize;
 
 /// The email address of a user.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, FromSql)]
 pub struct Email(String);
 
 /// Errors that can occur when parsing an string into an `Email`.
@@ -23,6 +25,20 @@ impl FromStr for Email {
         } else {
             Ok(Self(trimmed.to_string()))
         }
+    }
+}
+
+impl ToSql for Email {
+    accepts!(TEXT, VARCHAR);
+
+    to_sql_checked!();
+
+    fn to_sql(
+        &self,
+        t: &Type,
+        w: &mut BytesMut,
+    ) -> Result<IsNull, Box<dyn std::error::Error + Sync + Send>> {
+        self.0.to_sql(t, w)
     }
 }
 
