@@ -16,7 +16,9 @@ pub fn new(_database: Arc<dyn Database>) -> Arc<Component> {
     tracing::debug!("Building users service");
     let service = UsersService::new();
 
-    Arc::new(Component { service: Arc::new(service) })
+    Arc::new(Component {
+        service: Arc::new(service),
+    })
 }
 
 impl Configurer for Component {

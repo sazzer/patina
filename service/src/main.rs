@@ -21,7 +21,8 @@ impl Default for Settings {
     /// The Settings object, loaded from the environment variables
     fn default() -> Self {
         let mut s = Config::new();
-        s.merge(Environment::default()).expect("Failed to load environment properties");
+        s.merge(Environment::default())
+            .expect("Failed to load environment properties");
 
         s.try_into().expect("Failed to build settings from config")
     }
@@ -37,7 +38,9 @@ async fn main() {
     tracing::debug!(settings = ?settings, "Loaded settings");
 
     let service = patina::Service::new(&patina::Settings {
-        database: patina::DatabaseSettings { url: settings.database_url },
+        database: patina::DatabaseSettings {
+            url: settings.database_url,
+        },
     })
     .await;
     service.start(settings.port.unwrap_or(8000)).await;

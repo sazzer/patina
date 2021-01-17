@@ -27,10 +27,12 @@ pub struct SystemHealth {
 
 impl SystemHealth {
     /// Test if the overall system health is healthy.
-    /// The system is healthy if and only if all of the components are healthy. If any are unhealthy then
-    /// the overall system is unhealthy.
+    /// The system is healthy if and only if all of the components are healthy. If any are unhealthy
+    /// then the overall system is unhealthy.
     pub fn healthy(&self) -> bool {
-        self.components.iter().all(|(_, value)| value == &ComponentHealth::Healthy)
+        self.components
+            .iter()
+            .all(|(_, value)| value == &ComponentHealth::Healthy)
     }
 }
 
@@ -60,7 +62,10 @@ mod tests {
     #[test]
     fn system_health_given_unhealthy_components_is_unhealthy() {
         let mut components = HashMap::new();
-        components.insert("unhealthy".to_string(), ComponentHealth::Unhealthy("Oops".to_string()));
+        components.insert(
+            "unhealthy".to_string(),
+            ComponentHealth::Unhealthy("Oops".to_string()),
+        );
         let system = SystemHealth { components };
 
         check!(system.healthy() == false);
@@ -70,7 +75,10 @@ mod tests {
     fn system_health_given_mixed_components_is_unhealthy() {
         let mut components = HashMap::new();
         components.insert("healthy".to_string(), ComponentHealth::Healthy);
-        components.insert("unhealthy".to_string(), ComponentHealth::Unhealthy("Oops".to_string()));
+        components.insert(
+            "unhealthy".to_string(),
+            ComponentHealth::Unhealthy("Oops".to_string()),
+        );
         let system = SystemHealth { components };
 
         check!(system.healthy() == false);

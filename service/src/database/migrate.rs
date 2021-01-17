@@ -8,7 +8,8 @@ use super::Database;
 #[folder = "migrations/"]
 struct Migrations;
 
-/// Migrate the database pointed to by the provided database connection to the latest version of the schema
+/// Migrate the database pointed to by the provided database connection to the latest version of the
+/// schema
 ///
 /// # Parameters
 /// - `d` - The database to migrate
@@ -70,7 +71,8 @@ fn list_all_migrations() -> Vec<String> {
 
 /// Get a list of the migrations that have been previously applied
 ///
-/// This list is loaded from the database and indicates which of the migrations have been applied before
+/// This list is loaded from the database and indicates which of the migrations have been applied
+/// before
 ///
 /// # Parameters
 /// - `transaction` - The database transaction we're working in
@@ -120,9 +122,12 @@ async fn apply_migrations(tx: &tokio_postgres::Transaction<'_>) {
             tx.batch_execute(std::str::from_utf8(&contents).expect("Failed to load migration"))
                 .await
                 .expect("Failed to apply migration");
-            tx.execute("INSERT INTO __migrations(migration_file) VALUES ($1)", &[migration])
-                .await
-                .expect("Failed to record applied migration");
+            tx.execute(
+                "INSERT INTO __migrations(migration_file) VALUES ($1)",
+                &[migration],
+            )
+            .await
+            .expect("Failed to record applied migration");
             count += 1;
         }
     }

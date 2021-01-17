@@ -35,7 +35,10 @@ mod tests {
 
     #[test_case("",  ParseAuthenticationIdError::Blank  ; "blank string")]
     #[test_case("  ",  ParseAuthenticationIdError::Blank  ; "whitespace only")]
-    fn parse_authentication_id_given_invalid_input_then_error(input: &str, err: ParseAuthenticationIdError) {
+    fn parse_authentication_id_given_invalid_input_then_error(
+        input: &str,
+        err: ParseAuthenticationIdError,
+    ) {
         let parsed = AuthenticationId::from_str(input);
 
         let_assert!(Err(e) = parsed);

@@ -16,5 +16,7 @@ pub trait Database {
     ///
     /// # Errors
     /// If the pool is unable to return a viable connection
-    async fn checkout(&self) -> Result<Object<ClientWrapper, tokio_postgres::Error>, PoolError<tokio_postgres::Error>>;
+    async fn checkout(
+        &self,
+    ) -> Result<Object<ClientWrapper, tokio_postgres::Error>, PoolError<tokio_postgres::Error>>;
 }

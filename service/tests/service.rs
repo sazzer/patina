@@ -17,7 +17,9 @@ impl Service {
         let database = patina_testdatabase::TestDatabase::default();
 
         let settings = patina::Settings {
-            database: patina::DatabaseSettings { url: database.url.clone() },
+            database: patina::DatabaseSettings {
+                url: database.url.clone(),
+            },
         };
         let service = patina::Service::new(&settings).await;
 

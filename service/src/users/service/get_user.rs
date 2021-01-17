@@ -3,7 +3,9 @@ use async_trait::async_trait;
 use super::UsersService;
 use crate::{
     model::Identity,
-    users::{Authentication, AuthenticationService, GetUserUseCase, UserData, UserID, UserResource},
+    users::{
+        Authentication, AuthenticationService, GetUserUseCase, UserData, UserID, UserResource,
+    },
 };
 
 #[async_trait]

@@ -171,7 +171,9 @@ mod tests {
 
     #[test]
     fn hal_payload_given_two_links_with_different_names_has_correct_links() {
-        let resource = HalPayload::new(()).with_link("self", "/hello").with_link("other", "/other");
+        let resource = HalPayload::new(())
+            .with_link("self", "/hello")
+            .with_link("other", "/other");
 
         check!(resource.links.len() == 2);
 
@@ -186,7 +188,9 @@ mod tests {
 
     #[test]
     fn hal_payload_given_two_links_with_same_name_has_correct_links() {
-        let resource = HalPayload::new(()).with_link("item", "/hello").with_link("item", "/other");
+        let resource = HalPayload::new(())
+            .with_link("item", "/hello")
+            .with_link("item", "/other");
 
         check!(resource.links.len() == 1);
 

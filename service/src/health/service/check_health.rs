@@ -70,7 +70,10 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_unhealthy_components_is_unhealthy() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert("unhealthy".to_string(), Arc::new(MockComponent(Err("Oops".to_string()))));
+        components.insert(
+            "unhealthy".to_string(),
+            Arc::new(MockComponent(Err("Oops".to_string()))),
+        );
         let service = HealthService::new(components);
 
         let result = service.check_health().await;
@@ -84,7 +87,10 @@ mod tests {
     async fn health_service_given_mixed_components_is_unhealthy() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
         components.insert("healthy".to_string(), Arc::new(MockComponent(Ok(()))));
-        components.insert("unhealthy".to_string(), Arc::new(MockComponent(Err("Oops".to_string()))));
+        components.insert(
+            "unhealthy".to_string(),
+            Arc::new(MockComponent(Err("Oops".to_string()))),
+        );
         let service = HealthService::new(components);
 
         let result = service.check_health().await;

@@ -2,7 +2,9 @@ use std::{collections::HashMap, sync::Arc};
 
 use actix_web::web::ServiceConfig;
 
-use super::{endpoints::configure_server, service::HealthService, CheckHealthUseCase, HealthCheckable};
+use super::{
+    endpoints::configure_server, service::HealthService, CheckHealthUseCase, HealthCheckable,
+};
 use crate::server::Configurer;
 
 /// Builder for building the health checks component.
@@ -39,7 +41,9 @@ pub struct Component {
 pub fn builder() -> Builder {
     tracing::debug!("Building health checks");
 
-    Builder { components: HashMap::new() }
+    Builder {
+        components: HashMap::new(),
+    }
 }
 
 impl Configurer for Component {

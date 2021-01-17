@@ -7,7 +7,11 @@ async fn get_user_given_unknown_user_is_not_found() {
     let service = crate::Service::new().await;
 
     let response = service
-        .inject(TestRequest::get().uri("/users/3f92b3b0-4716-449a-a159-beabf3b59d99").to_request())
+        .inject(
+            TestRequest::get()
+                .uri("/users/3f92b3b0-4716-449a-a159-beabf3b59d99")
+                .to_request(),
+        )
         .await;
 
     check!(response.status == 404);
@@ -26,7 +30,9 @@ async fn get_user_given_unknown_user_is_not_found() {
 async fn get_user_given_invalid_id_is_not_found() {
     let service = crate::Service::new().await;
 
-    let response = service.inject(TestRequest::get().uri("/users/not_a_uuid").to_request()).await;
+    let response = service
+        .inject(TestRequest::get().uri("/users/not_a_uuid").to_request())
+        .await;
 
     check!(response.status == 404);
     check!(response.headers.get("content-type").unwrap() == "application/problem+json");
@@ -46,7 +52,11 @@ async fn get_user_given_known_id_is_returned() {
     // TODO: Seed User
 
     let response = service
-        .inject(TestRequest::get().uri("/users/384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3").to_request())
+        .inject(
+            TestRequest::get()
+                .uri("/users/384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3")
+                .to_request(),
+        )
         .await;
 
     check!(response.status == 200);

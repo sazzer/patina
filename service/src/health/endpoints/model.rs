@@ -49,7 +49,11 @@ impl From<SystemHealth> for Response<SystemHealthResponse> {
             body.components.insert(name, status.into());
         }
 
-        let status = if body.healthy { StatusCode::OK } else { StatusCode::SERVICE_UNAVAILABLE };
+        let status = if body.healthy {
+            StatusCode::OK
+        } else {
+            StatusCode::SERVICE_UNAVAILABLE
+        };
 
         Self {
             body: Some(body),

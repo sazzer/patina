@@ -9,7 +9,9 @@ pub struct Builder {
 
 /// Create a builder used to construct the server.
 pub fn builder() -> Builder {
-    Builder { configurers: vec![] }
+    Builder {
+        configurers: vec![],
+    }
 }
 
 impl Builder {
