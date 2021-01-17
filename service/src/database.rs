@@ -8,7 +8,7 @@ use deadpool_postgres::ClientWrapper;
 
 /// Wrapper around the database connection.
 #[async_trait]
-pub trait Database {
+pub trait Database: Send + Sync {
     /// Check out a connection from the database pool in order to make queries
     ///
     /// # Returns

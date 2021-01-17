@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use actix_web::web::ServiceConfig;
 
-use super::{endpoints::configure_server, service::UsersService, GetUserUseCase};
+use super::{
+    endpoints::configure_server, repository::Repository, service::UsersService, GetUserUseCase,
+};
 use crate::{database::Database, server::Configurer};
 
 /// Configuration component for working with users.
@@ -12,9 +14,10 @@ pub struct Component {
 
 /// Construct a new users component.
 #[allow(clippy::needless_pass_by_value)] // TODO: FIX
-pub fn new(_database: Arc<dyn Database>) -> Arc<Component> {
+pub fn new(database: Arc<dyn Database>) -> Arc<Component> {
     tracing::debug!("Building users service");
-    let service = UsersService::new();
+    let repository = Repository::new(database);
+    let service = UsersService::new(repository);
 
     Arc::new(Component {
         service: Arc::new(service),
