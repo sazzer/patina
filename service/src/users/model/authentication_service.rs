@@ -1,5 +1,7 @@
+use serde::Serialize;
+
 /// The identity of the authentication service the user is authenticated with.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct AuthenticationService(String);
 
 impl AuthenticationService {

@@ -1,7 +1,9 @@
 use std::str::FromStr;
 
+use serde::Serialize;
+
 /// The email address of a user.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Email(String);
 
 /// Errors that can occur when parsing an string into an `Email`.

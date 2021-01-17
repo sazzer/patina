@@ -2,6 +2,8 @@ use std::str::FromStr;
 
 use uuid::Uuid;
 
+use crate::http::hal::Link;
+
 /// The ID of a user.
 #[derive(Debug, PartialEq)]
 pub struct UserID(Uuid);
@@ -12,6 +14,11 @@ impl Default for UserID {
     }
 }
 
+impl From<UserID> for Link {
+    fn from(value: UserID) -> Self {
+        Self::from(format!("/users/{}", value.0))
+    }
+}
 /// Errors that can occur when parsing an string into an `UserID`.
 #[derive(Debug, PartialEq, thiserror::Error)]
 pub enum ParseUserIDError {

@@ -1,4 +1,5 @@
 mod get_user;
+mod model;
 
 use actix_web::web::{get, resource, ServiceConfig};
 

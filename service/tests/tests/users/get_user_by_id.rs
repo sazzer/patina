@@ -39,3 +39,36 @@ async fn get_user_given_invalid_id_is_not_found() {
     }
     "###);
 }
+
+#[actix_rt::test]
+async fn get_user_given_known_id_is_returned() {
+    let service = crate::Service::new().await;
+    // TODO: Seed User
+
+    let response = service
+        .inject(TestRequest::get().uri("/users/384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3").to_request())
+        .await;
+
+    check!(response.status == 200);
+    check!(response.headers.get("content-type").unwrap() == "application/hal+json");
+    check!(response.headers.get("cache-control").unwrap() == "public, max-age=3600");
+    check!(response.headers.get("etag").unwrap() == "\"a76b376a-9ca9-4b90-bb20-c5c5133d2ba7\"");
+    assert_json_snapshot!(response.to_json().unwrap(), @r###"
+    {
+      "displayName": "Test User",
+      "email": "test@example.com",
+      "authentications": [
+        {
+          "service": "fake",
+          "userId": "123456",
+          "displayName": "test@example.com"
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "/users/384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3"
+        }
+      }
+    }
+    "###);
+}
