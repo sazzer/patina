@@ -1,4 +1,7 @@
+mod user;
+
 use postgres_types::ToSql;
+pub use user::*;
 
 /// Trait that can be implemented by anything able to contribute seed data to the database
 pub trait SeedData: std::fmt::Debug {

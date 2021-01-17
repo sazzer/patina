@@ -1,11 +1,11 @@
 use actix_http::Request;
 use patina::testing::TestResponse;
+use patina_testdatabase::seed::SeedData;
 
 /// Wrapper around the service to test.
 pub struct Service {
     service: patina::Service,
 
-    #[allow(dead_code)] // TODO: FIX
     database: patina_testdatabase::TestDatabase,
 }
 
@@ -29,5 +29,14 @@ impl Service {
     /// Inject a request into the service and get the response back.
     pub async fn inject(&self, req: Request) -> TestResponse {
         self.service.inject(req).await
+    }
+
+    /// Seed some data into the database
+    ///
+    /// # Parameters
+    /// - `data` - The data to seed
+    pub async fn seed(&self, data: &dyn SeedData) -> &Self {
+        self.database.seed(data).await;
+        self
     }
 }
