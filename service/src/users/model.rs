@@ -1,22 +1,14 @@
-use uuid::Uuid;
+mod authentication_id;
+mod authentication_service;
+mod email;
+mod user_id;
+
+pub use authentication_id::*;
+pub use authentication_service::*;
+pub use email::*;
+pub use user_id::*;
 
 use crate::model::Resource;
-
-/// The ID of a user.
-#[derive(Debug, PartialEq)]
-pub struct UserID(Uuid);
-
-/// The email address of a user.
-#[derive(Debug)]
-pub struct Email(String);
-
-/// The identity of the authentication service the user is authenticated with.
-#[derive(Debug)]
-pub struct AuthenticationService(String);
-
-/// The identity of the user at the authentication service.
-#[derive(Debug)]
-pub struct AuthenticationId(String);
 
 /// A set of authentication details for the user.
 #[derive(Debug)]
