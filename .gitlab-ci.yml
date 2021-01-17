@@ -1,0 +1,50 @@
+stages:
+  - build
+
+service:test:
+  stage: build
+  image: rust:latest
+
+  services:
+    - docker:dind
+
+  variables:
+    DOCKER_HOSTNAME: docker
+    DOCKER_HOST: tcp://$DOCKER_HOSTNAME:2375
+    DOCKER_DRIVER: overlay2
+    RUST_LOG: debug
+    RUST_BACKTRACE: 1
+    CARGO_HOME: $CI_PROJECT_DIR/service/.cargo
+
+  script:
+    # Show Rust versions
+    - rustc --version
+    - cargo --version
+
+    # Set up dependencies - docker
+    - apt update
+    - apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+    - curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+    - apt-key fingerprint 0EBFCD88
+    - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+    - apt update
+    - apt install -y docker-ce-cli
+    - docker version
+    # Set up dependencies - clippy
+    - rustup component add clippy
+
+    # Actually do the build
+    - cd service
+    - if [ -d target ]; then find target -name *patina* -type d | xargs rm -rf; fi
+    - find . -name *.rs | grep -v target | xargs touch
+    - cargo clippy
+    - cargo test
+
+  cache:
+    key:
+      prefix: patina-service
+      files:
+        - service/Cargo.lock
+    paths:
+      - service/.cargo
+      - service/target
