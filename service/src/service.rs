@@ -23,9 +23,13 @@ impl Service {
         let health = crate::health::config::builder()
             .with_component("db", database)
             .build();
+        let home = crate::home::config::builder()
+            .with_component(health.clone())
+            .build();
         let server = crate::server::config::builder()
             .with_component(health)
             .with_component(users)
+            .with_component(home)
             .build();
 
         tracing::info!("Built service");

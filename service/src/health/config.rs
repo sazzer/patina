@@ -3,9 +3,11 @@ use std::{collections::HashMap, sync::Arc};
 use actix_web::web::ServiceConfig;
 
 use super::{
-    endpoints::configure_server, service::HealthService, CheckHealthUseCase, HealthCheckable,
+    endpoints::{configure_server, home_document_links},
+    service::HealthService,
+    CheckHealthUseCase, HealthCheckable,
 };
-use crate::server::Configurer;
+use crate::{home::Contributor, http::hal::Link, server::Configurer};
 
 /// Builder for building the health checks component.
 pub struct Builder {
@@ -51,5 +53,11 @@ impl Configurer for Component {
         config.data(self.service.clone() as Arc<dyn CheckHealthUseCase>);
 
         configure_server(config);
+    }
+}
+
+impl Contributor for Component {
+    fn get_links(&self) -> Vec<(&'static str, Link)> {
+        home_document_links()
     }
 }
