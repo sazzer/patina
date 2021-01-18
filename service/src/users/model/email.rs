@@ -49,13 +49,13 @@ mod tests {
 
     use super::*;
 
-    #[test_case("",  ParseEmailError::Blank  ; "blank string")]
-    #[test_case("  ",  ParseEmailError::Blank  ; "whitespace only")]
-    fn parse_email_given_invalid_input_then_error(input: &str, err: ParseEmailError) {
+    #[test_case("",  &ParseEmailError::Blank  ; "blank string")]
+    #[test_case("  ",  &ParseEmailError::Blank  ; "whitespace only")]
+    fn parse_email_given_invalid_input_then_error(input: &str, err: &ParseEmailError) {
         let parsed = Email::from_str(input);
 
         let_assert!(Err(e) = parsed);
-        check!(e == err);
+        check!(&e == err);
     }
 
     #[test_case("test@example.com",  "test@example.com"  ; "simple string")]

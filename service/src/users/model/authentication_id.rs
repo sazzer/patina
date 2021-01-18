@@ -33,16 +33,16 @@ mod tests {
 
     use super::*;
 
-    #[test_case("",  ParseAuthenticationIdError::Blank  ; "blank string")]
-    #[test_case("  ",  ParseAuthenticationIdError::Blank  ; "whitespace only")]
+    #[test_case("",  &ParseAuthenticationIdError::Blank  ; "blank string")]
+    #[test_case("  ",  &ParseAuthenticationIdError::Blank  ; "whitespace only")]
     fn parse_authentication_id_given_invalid_input_then_error(
         input: &str,
-        err: ParseAuthenticationIdError,
+        err: &ParseAuthenticationIdError,
     ) {
         let parsed = AuthenticationId::from_str(input);
 
         let_assert!(Err(e) = parsed);
-        check!(e == err);
+        check!(&e == err);
     }
 
     #[test_case("15612523",  "15612523"  ; "simple string")]

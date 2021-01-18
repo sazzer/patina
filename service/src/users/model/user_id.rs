@@ -70,15 +70,15 @@ mod tests {
 
     use super::*;
 
-    #[test_case("",  ParseUserIDError::Blank  ; "blank string")]
-    #[test_case("  ",  ParseUserIDError::Blank  ; "whitespace only")]
-    #[test_case("notAUUID",  ParseUserIDError::Malformed  ; "not a uuid")]
-    #[test_case("9766f4af-f2de-4f19-8326-9f856e829d4h",  ParseUserIDError::Malformed  ; "invalid character")]
-    fn parse_user_id_given_invalid_input_then_error(input: &str, err: ParseUserIDError) {
+    #[test_case("",  &ParseUserIDError::Blank  ; "blank string")]
+    #[test_case("  ",  &ParseUserIDError::Blank  ; "whitespace only")]
+    #[test_case("notAUUID",  &ParseUserIDError::Malformed  ; "not a uuid")]
+    #[test_case("9766f4af-f2de-4f19-8326-9f856e829d4h",  &ParseUserIDError::Malformed  ; "invalid character")]
+    fn parse_user_id_given_invalid_input_then_error(input: &str, err: &ParseUserIDError) {
         let parsed = UserID::from_str(input);
 
         let_assert!(Err(e) = parsed);
-        check!(e == err);
+        check!(&e == err);
     }
 
     #[test_case("9766f4af-f2de-4f19-8326-9f856e829d46",  "9766f4af-f2de-4f19-8326-9f856e829d46"  ; "simple string")]

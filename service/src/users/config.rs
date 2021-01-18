@@ -13,7 +13,6 @@ pub struct Component {
 }
 
 /// Construct a new users component.
-#[allow(clippy::needless_pass_by_value)] // TODO: FIX
 pub fn new(database: Arc<dyn Database>) -> Arc<Component> {
     tracing::debug!("Building users service");
     let repository = Repository::new(database);
