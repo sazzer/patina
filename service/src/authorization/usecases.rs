@@ -9,5 +9,5 @@ pub trait GenerateSecurityContextUseCase {
     ///
     /// # Returns
     /// The security context.
-    fn generate_use_case(&self, principal: Principal) -> SecurityContext;
+    fn generate_security_context(&self, principal: Principal) -> SecurityContext;
 }
