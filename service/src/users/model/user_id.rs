@@ -4,7 +4,7 @@ use bytes::BytesMut;
 use postgres_types::{accepts, to_sql_checked, FromSql, IsNull, ToSql, Type};
 use uuid::Uuid;
 
-use crate::http::hal::Link;
+use crate::{authorization::Principal, http::hal::Link};
 
 /// The ID of a user.
 #[derive(Debug, PartialEq, FromSql)]
@@ -33,6 +33,12 @@ impl ToSql for UserID {
         w: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn std::error::Error + Sync + Send>> {
         self.0.to_sql(t, w)
+    }
+}
+
+impl Into<Principal> for UserID {
+    fn into(self) -> Principal {
+        Principal::User(self.0.to_string())
     }
 }
 
