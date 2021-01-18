@@ -19,6 +19,7 @@ impl Service {
         tracing::info!("Building service");
 
         let database = crate::database::config::new(&settings.database).await;
+        let _authorization = crate::authorization::config::new();
         let users = crate::users::config::new(database.clone());
         let health = crate::health::config::builder()
             .with_component("db", database)
