@@ -4,6 +4,7 @@ mod generate;
 
 /// Service implementation for working with Security Contexts.
 pub struct SecurityContextService {
+    /// The duration that generated security contexts are valid for.
     duration: Duration,
 }
 

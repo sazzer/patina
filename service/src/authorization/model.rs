@@ -27,3 +27,7 @@ pub struct SecurityContext {
     pub issued:    DateTime<Utc>,
     pub expires:   DateTime<Utc>,
 }
+
+/// Representation of an Access Token - a security context that has been signed and encoded.
+#[derive(Debug)]
+pub struct AccessToken(String);
