@@ -1,7 +1,6 @@
 use biscuit::{
-    jwa::SignatureAlgorithm,
-    jws::{RegisteredHeader, Secret},
-    ClaimsSet, RegisteredClaims, SingleOrMultiple, JWT,
+    jwa::SignatureAlgorithm, jws::RegisteredHeader, ClaimsSet, RegisteredClaims, SingleOrMultiple,
+    JWT,
 };
 
 use super::AccessTokenService;
@@ -11,8 +10,6 @@ const ISSUER: &str = "tag:patina,2021,authorization";
 
 impl GenerateAccessTokenUseCase for AccessTokenService {
     fn generate_access_token(&self, security_context: SecurityContext) -> AccessToken {
-        let signing_secret = Secret::Bytes("secret".to_string().into_bytes());
-
         let claims = ClaimsSet::<()> {
             registered: RegisteredClaims {
                 issuer:     Some(ISSUER.to_string()),
@@ -35,7 +32,7 @@ impl GenerateAccessTokenUseCase for AccessTokenService {
 
         let decoded = JWT::new_decoded(header.into(), claims);
         let encoded = decoded
-            .into_encoded(&signing_secret)
+            .into_encoded(&self.signing_secret)
             .expect("Failed to encode JWT") // This can't happen
             .encoded()
             .expect("Failed to unwrap encoded JWT")
@@ -65,7 +62,7 @@ mod tests {
             id:        SecurityContextId::default(),
         };
 
-        let sut = AccessTokenService::new();
+        let sut = AccessTokenService::new("secret");
 
         let access_token = sut.generate_access_token(security_context);
         let_assert!(AccessToken(jwt) = access_token);
