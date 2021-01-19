@@ -9,7 +9,7 @@ pub enum Principal {
 
 /// Representation of the unique ID of a Security Context.
 #[derive(Debug, PartialEq)]
-pub struct SecurityContextId(String);
+pub struct SecurityContextId(pub(super) String);
 
 impl Default for SecurityContextId {
     fn default() -> Self {
@@ -30,4 +30,4 @@ pub struct SecurityContext {
 
 /// Representation of an Access Token - a security context that has been signed and encoded.
 #[derive(Debug)]
-pub struct AccessToken(String);
+pub struct AccessToken(pub(super) String);

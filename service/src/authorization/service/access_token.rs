@@ -1,3 +1,5 @@
+mod generate;
+
 /// Service implementation for working with access tokens.
 pub struct AccessTokenService {}
 
