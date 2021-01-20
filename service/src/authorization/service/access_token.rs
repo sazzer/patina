@@ -1,6 +1,7 @@
 use biscuit::jws::Secret;
 
 mod generate;
+mod validate;
 
 /// Service implementation for working with access tokens.
 pub struct AccessTokenService {

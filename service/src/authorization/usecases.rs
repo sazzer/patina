@@ -23,3 +23,26 @@ pub trait GenerateAccessTokenUseCase {
     /// The access token
     fn generate_access_token(&self, security_context: SecurityContext) -> AccessToken;
 }
+
+/// Use Case for validating an access token and returning the Security Context that generated it.
+pub trait ValidateAccessTokenUseCase {
+    /// Test if the provided access token is valid, and if so then rebuild the security context from
+    /// it.
+    ///
+    /// # Parameters
+    /// - `access_token` - The access token to validate
+    ///
+    /// # Returns
+    /// The security context that the access token represents, or else an error indicating why it
+    /// was invalid.
+    fn validate_access_token(
+        &self,
+        access_token: AccessToken,
+    ) -> Result<SecurityContext, ValidateAccessTokenError>;
+}
+
+#[derive(Debug, PartialEq, thiserror::Error)]
+pub enum ValidateAccessTokenError {
+    #[error("An unexpected error occurred")]
+    UnexpectedError,
+}
