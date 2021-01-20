@@ -17,6 +17,9 @@ async fn home_document_is_successful() {
     assert_json_snapshot!(response.to_json().unwrap(), @r###"
     {
       "_links": {
+        "tag:patina,2021:rels/authentication": {
+          "href": "/authentication"
+        },
         "tag:patina,2021:rels/health": {
           "href": "/health"
         }

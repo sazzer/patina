@@ -1,6 +1,7 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery)]
 #![allow(clippy::future_not_send, clippy::module_name_repetitions)]
 
+mod authentication;
 mod authorization;
 mod database;
 mod health;
