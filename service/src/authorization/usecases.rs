@@ -43,6 +43,6 @@ pub trait ValidateAccessTokenUseCase {
 
 #[derive(Debug, PartialEq, thiserror::Error)]
 pub enum ValidateAccessTokenError {
-    #[error("An unexpected error occurred")]
-    UnexpectedError,
+    #[error("The access token was malformed")]
+    Malformed,
 }
