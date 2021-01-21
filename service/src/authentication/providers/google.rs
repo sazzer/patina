@@ -13,4 +13,8 @@ impl GoogleProvider {
 }
 
 #[async_trait]
-impl Provider for GoogleProvider {}
+impl Provider for GoogleProvider {
+    fn start_authentication(&self, _nonce: String) -> url::Url {
+        todo!()
+    }
+}
