@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use actix_http::http::header::CacheDirective;
+use actix_web::web::Data;
 
 use crate::{
-    authentication::ProviderId,
+    authentication::ListProvidersUseCase,
     http::{
         hal::{HalPayload, HalResponse},
         response::Response,
@@ -9,13 +12,10 @@ use crate::{
 };
 
 /// Endpoint to get a list of authentication providers.
-pub async fn list_providers() -> Response<HalPayload<()>> {
-    let mut providers = vec![
-        ProviderId::new("google"),
-        ProviderId::new("facebook"),
-        ProviderId::new("twitter"),
-    ];
-    providers.sort();
+pub async fn list_providers(
+    service: Data<Arc<dyn ListProvidersUseCase>>,
+) -> Response<HalPayload<()>> {
+    let providers = service.list_providers();
 
     let mut payload = HalPayload::new(()).with_link("self", "/authentication");
 
