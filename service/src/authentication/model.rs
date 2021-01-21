@@ -1,5 +1,5 @@
 /// Identifier of an authentication provider.
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub struct ProviderId(pub(super) String);
 
 impl ProviderId {

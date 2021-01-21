@@ -20,7 +20,10 @@ pub async fn list_providers(
     let mut payload = HalPayload::new(()).with_link("self", "/authentication");
 
     for provider in providers {
-        payload = payload.with_link("tag:patina,2021,rels/authentication/start", provider);
+        payload = payload.with_link(
+            "tag:patina,2021,rels/authentication/start",
+            provider.clone(),
+        );
     }
 
     HalResponse {

@@ -21,7 +21,9 @@ impl Service {
         let database = crate::database::config::new(&settings.database).await;
         let _authorization = crate::authorization::config::new();
         let users = crate::users::config::new(database.clone());
-        let authentication = crate::authentication::config::builder().build();
+        let authentication = crate::authentication::config::builder()
+            .with_google()
+            .build();
         let health = crate::health::config::builder()
             .with_component("db", database)
             .build();

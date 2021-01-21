@@ -2,8 +2,8 @@ use super::AuthenticationService;
 use crate::authentication::{ListProvidersUseCase, ProviderId};
 
 impl ListProvidersUseCase for AuthenticationService {
-    fn list_providers(&self) -> Vec<crate::authentication::ProviderId> {
-        let mut providers = vec![ProviderId::new("twitter"), ProviderId::new("google")];
+    fn list_providers(&self) -> Vec<&ProviderId> {
+        let mut providers: Vec<&ProviderId> = self.providers.keys().into_iter().collect();
         providers.sort();
 
         providers

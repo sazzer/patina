@@ -17,16 +17,10 @@ async fn list_providers_is_successful() {
         "self": {
           "href": "/authentication"
         },
-        "tag:patina,2021,rels/authentication/start": [
-          {
-            "href": "/authentication/google",
-            "name": "google"
-          },
-          {
-            "href": "/authentication/twitter",
-            "name": "twitter"
-          }
-        ]
+        "tag:patina,2021,rels/authentication/start": {
+          "href": "/authentication/google",
+          "name": "google"
+        }
       }
     }
     "###);

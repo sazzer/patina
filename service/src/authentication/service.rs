@@ -1,11 +1,18 @@
+use std::{collections::HashMap, sync::Arc};
+
+use super::{providers::Provider, ProviderId};
+
 mod list;
 
 /// Service for managing authentication.
-pub struct AuthenticationService {}
+pub struct AuthenticationService {
+    /// The authentication providers to use.
+    providers: HashMap<ProviderId, Arc<dyn Provider>>,
+}
 
 impl AuthenticationService {
     /// Create a new instance of the authentication service.
-    pub const fn new() -> Self {
-        Self {}
+    pub fn new(providers: HashMap<ProviderId, Arc<dyn Provider>>) -> Self {
+        Self { providers }
     }
 }
