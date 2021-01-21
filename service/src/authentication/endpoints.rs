@@ -1,4 +1,5 @@
 mod list_providers;
+mod model;
 
 use actix_web::web::{get, resource, ServiceConfig};
 
