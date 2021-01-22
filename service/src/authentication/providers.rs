@@ -1,7 +1,6 @@
 pub mod google;
 
 use async_trait::async_trait;
-use url::Url;
 
 /// Trait representing an authentication provider.
 #[async_trait]
@@ -14,5 +13,5 @@ pub trait Provider: Sync + Send {
     ///
     /// # Returns
     /// The URL to redirect the user to in order to start authentication.
-    fn start_authentication(&self, nonce: String) -> Url;
+    fn start_authentication(&self, nonce: &str) -> String;
 }
