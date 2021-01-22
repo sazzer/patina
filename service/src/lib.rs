@@ -12,5 +12,6 @@ mod server;
 mod service;
 mod users;
 
+pub use authentication::config::GoogleSettings;
 pub use database::config::Settings as DatabaseSettings;
 pub use service::{testing, Service, Settings};

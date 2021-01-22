@@ -20,6 +20,13 @@ impl Service {
             database: patina::DatabaseSettings {
                 url: database.url.clone(),
             },
+            google:   Some(patina::GoogleSettings {
+                client_id:     "GoogleClientId".to_string(),
+                client_secret: "GoogleClientSecret".to_string(),
+                redirect_url:  "http://example.com/authentication/google/redirect".to_string(),
+                auth_url:      None,
+                token_url:     None,
+            }),
         };
         let service = patina::Service::new(&settings).await;
 

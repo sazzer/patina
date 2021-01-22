@@ -11,6 +11,7 @@ pub struct Service {
 #[derive(Debug)]
 pub struct Settings {
     pub database: crate::database::config::Settings,
+    pub google:   Option<crate::authentication::config::GoogleSettings>,
 }
 
 impl Service {
@@ -22,7 +23,7 @@ impl Service {
         let _authorization = crate::authorization::config::new();
         let users = crate::users::config::new(database.clone());
         let authentication = crate::authentication::config::builder()
-            .with_google()
+            .with_google(&settings.google)
             .build();
         let health = crate::health::config::builder()
             .with_component("db", database)
