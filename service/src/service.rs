@@ -1,5 +1,7 @@
 pub mod testing;
 
+use prometheus::Registry;
+
 use crate::server::Server;
 
 /// The actual service layer.
@@ -19,7 +21,9 @@ impl Service {
     pub async fn new(settings: &Settings) -> Self {
         tracing::info!("Building service");
 
-        let database = crate::database::config::new(&settings.database).await;
+        let prometheus = Registry::new();
+
+        let database = crate::database::config::new(&settings.database, &prometheus).await;
         let _authorization = crate::authorization::config::new();
         let users = crate::users::config::new(database.clone());
         let authentication = crate::authentication::config::builder()
@@ -32,7 +36,7 @@ impl Service {
             .with_component(health.clone())
             .with_component(authentication.clone())
             .build();
-        let server = crate::server::config::builder()
+        let server = crate::server::config::builder(prometheus)
             .with_component(health)
             .with_component(users)
             .with_component(authentication)

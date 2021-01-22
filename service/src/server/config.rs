@@ -1,15 +1,19 @@
 use std::sync::Arc;
 
+use prometheus::Registry;
+
 use super::{Configurer, Server};
 
 /// Configuration component for the HTTP Server.
 pub struct Builder {
+    prometheus:  Registry,
     configurers: Vec<Arc<dyn Configurer>>,
 }
 
 /// Create a builder used to construct the server.
-pub fn builder() -> Builder {
+pub fn builder(prometheus: Registry) -> Builder {
     Builder {
+        prometheus,
         configurers: vec![],
     }
 }
@@ -26,6 +30,6 @@ impl Builder {
 
     /// Build the HTTP Server.
     pub fn build(self) -> Server {
-        Server::new(self.configurers)
+        Server::new(self.configurers, self.prometheus)
     }
 }

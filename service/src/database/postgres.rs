@@ -3,17 +3,19 @@ use std::str::FromStr;
 use async_trait::async_trait;
 use deadpool::managed::Object;
 use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
+use prometheus::{opts, IntCounterVec, Registry};
 
 use super::Database;
 use crate::health::HealthCheckable;
 
 /// Database connection that works in terms of Postgres.
 pub struct Postgres {
-    pool: Pool,
+    pool:             Pool,
+    checkout_counter: IntCounterVec,
 }
 
 impl Postgres {
-    pub async fn new(url: &str) -> Self {
+    pub async fn new(url: &str, prometheus: &Registry) -> Self {
         let pg_config = tokio_postgres::Config::from_str(url).expect("Invalid database URL");
 
         let mgr_config = ManagerConfig {
@@ -26,13 +28,26 @@ impl Postgres {
             .await
             .expect("Unable to open database connection");
 
-        Self { pool }
+        let counter_opts =
+            opts!("checkout", "Number of connections checked out").namespace("postgres");
+        let checkout_counter = IntCounterVec::new(counter_opts, &[]).unwrap();
+
+        prometheus
+            .register(Box::new(checkout_counter.clone()))
+            .unwrap();
+
+        Self {
+            pool,
+            checkout_counter,
+        }
     }
 }
 
 #[async_trait]
 impl Database for Postgres {
     async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error> {
+        self.checkout_counter.with_label_values(&[]).inc();
+
         self.pool
             .get()
             .await
@@ -43,6 +58,8 @@ impl Database for Postgres {
 #[async_trait]
 impl HealthCheckable for Postgres {
     async fn check_health(&self) -> Result<(), String> {
+        self.checkout_counter.with_label_values(&[]).inc();
+
         let conn = self.pool.get().await.map_err(|e| e.to_string())?;
 
         conn.simple_query("SELECT 1")

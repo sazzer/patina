@@ -3,6 +3,8 @@ use std::sync::Arc;
 use actix_cors::Cors;
 use actix_http::http::header;
 use actix_web::{middleware::Logger, web::ServiceConfig, App, HttpServer};
+use actix_web_prom::PrometheusMetrics;
+use prometheus::Registry;
 
 pub mod config;
 
@@ -19,6 +21,7 @@ pub trait Configurer: Send + Sync {
 pub struct Server {
     /// The set of configurers to wire details into the server.
     pub(super) config: Vec<Arc<dyn Configurer>>,
+    prometheus:        Registry,
 }
 
 impl Server {
@@ -29,8 +32,8 @@ impl Server {
     ///
     /// # Returns
     /// The HTTP server, ready to use.
-    pub fn new(config: Vec<Arc<dyn Configurer>>) -> Self {
-        Self { config }
+    pub fn new(config: Vec<Arc<dyn Configurer>>, prometheus: Registry) -> Self {
+        Self { config, prometheus }
     }
 
     /// Start the Universe HTTP Server listening for requests.
@@ -42,10 +45,15 @@ impl Server {
         tracing::info!(address = ?address, "Starting HTTP server");
 
         let config = self.config.clone();
+        let prometheus =
+            PrometheusMetrics::new_with_registry(self.prometheus, "patina", Some("/metrics"), None)
+                .unwrap();
+
         HttpServer::new(move || {
             let config = config.clone();
+            let prometheus = prometheus.clone();
 
-            let mut app = App::new().wrap(Logger::default()).wrap(
+            let mut app = App::new().wrap(Logger::default()).wrap(prometheus).wrap(
                 Cors::default()
                     .allow_any_origin()
                     .allow_any_method()
