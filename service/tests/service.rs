@@ -12,7 +12,7 @@ pub struct Service {
 impl Service {
     /// Create a new test service.
     pub async fn new() -> Self {
-        let _ = tracing_subscriber::fmt::try_init();
+        let _ = env_logger::try_init();
 
         let database = patina_testdatabase::TestDatabase::default();
 

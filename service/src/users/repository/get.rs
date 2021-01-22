@@ -9,6 +9,7 @@ impl Repository {
     ///
     /// # Returns
     /// The user, or `None` if the user isn't found.
+    #[tracing::instrument(skip(self))]
     pub async fn get_by_id(&self, id: UserID) -> Option<UserResource> {
         let conn = self.database.checkout().await;
 

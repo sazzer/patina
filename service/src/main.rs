@@ -3,6 +3,8 @@
 use config::{Config, Environment};
 use dotenv::dotenv;
 use serde::Deserialize;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::Registry;
 
 /// Representation of the application settings that will be loaded from the environment
 #[derive(Debug, Deserialize)]
@@ -43,10 +45,20 @@ impl Default for Settings {
 async fn main() {
     dotenv().ok();
 
-    tracing_subscriber::fmt::init();
+    env_logger::init();
 
     let settings = Settings::default();
     tracing::debug!(settings = ?settings, "Loaded settings");
+
+    opentelemetry::global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
+    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+        .with_service_name("patina")
+        .from_env()
+        .install()
+        .unwrap();
+    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let subscriber = Registry::default().with(telemetry);
+    tracing::subscriber::set_global_default(subscriber).unwrap();
 
     let service = patina::Service::new(&patina::Settings {
         database: patina::DatabaseSettings {

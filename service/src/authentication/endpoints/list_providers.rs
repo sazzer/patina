@@ -12,6 +12,7 @@ use crate::{
 };
 
 /// Endpoint to get a list of authentication providers.
+#[tracing::instrument(skip(service))]
 pub async fn list_providers(
     service: Data<Arc<dyn ListProvidersUseCase>>,
 ) -> Response<HalPayload<()>> {

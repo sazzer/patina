@@ -18,6 +18,7 @@ pub struct Settings {
 
 impl Service {
     /// Create a new instance of the service layer.
+    #[tracing::instrument]
     pub async fn new(settings: &Settings) -> Self {
         tracing::info!("Building service");
 

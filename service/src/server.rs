@@ -46,7 +46,7 @@ impl Server {
 
         let config = self.config.clone();
         let prometheus =
-            PrometheusMetrics::new_with_registry(self.prometheus, "patina", Some("/metrics"), None)
+            PrometheusMetrics::new_with_registry(self.prometheus, "actix", Some("/metrics"), None)
                 .unwrap();
 
         HttpServer::new(move || {
