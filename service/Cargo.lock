@@ -1559,6 +1559,7 @@ dependencies = [
  "actix-cors",
  "actix-http",
  "actix-rt",
+ "actix-service",
  "actix-web",
  "actix-web-prom",
  "assert2",

@@ -1,3 +1,6 @@
+pub mod config;
+mod span;
+
 use std::sync::Arc;
 
 use actix_cors::Cors;
@@ -5,8 +8,6 @@ use actix_http::http::header;
 use actix_web::{middleware::Logger, web::ServiceConfig, App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
 use prometheus::Registry;
-
-pub mod config;
 
 /// Trait implemented by all components that can contribute to the Actix service.
 pub trait Configurer: Send + Sync {
@@ -53,13 +54,17 @@ impl Server {
             let config = config.clone();
             let prometheus = prometheus.clone();
 
-            let mut app = App::new().wrap(Logger::default()).wrap(prometheus).wrap(
-                Cors::default()
-                    .allow_any_origin()
-                    .allow_any_method()
-                    .allow_any_header()
-                    .expose_headers(vec![header::ETAG, header::LOCATION, header::LINK]),
-            );
+            let mut app = App::new()
+                .wrap(Logger::default())
+                .wrap(prometheus)
+                .wrap(
+                    Cors::default()
+                        .allow_any_origin()
+                        .allow_any_method()
+                        .allow_any_header()
+                        .expose_headers(vec![header::ETAG, header::LOCATION, header::LINK]),
+                )
+                .wrap(span::Span);
 
             for c in &config {
                 app = app.configure(move |server_config| {
