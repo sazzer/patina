@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use actix_http::Response;
+use actix_http::{cookie::Cookie, Response};
 use actix_web::web::{Data, Path};
 
 use crate::{
@@ -14,12 +14,22 @@ pub async fn start(
     path: Path<String>,
     service: Data<Arc<dyn StartAuthenticationUseCase>>,
 ) -> Result<Response, Problem> {
-    let provider_id = ProviderId::new(path.0);
+    let provider_id = ProviderId::new(&path.0);
 
     let redirect_details = service.start_authentication(&provider_id)?;
 
     Ok(Response::SeeOther()
         .set_header("Location", redirect_details.redirect_url)
+        .cookie(
+            Cookie::build("authentication_provider", path.0)
+                .http_only(true)
+                .finish(),
+        )
+        .cookie(
+            Cookie::build("authentication_nonce", redirect_details.nonce)
+                .http_only(true)
+                .finish(),
+        )
         .finish())
 }
 
