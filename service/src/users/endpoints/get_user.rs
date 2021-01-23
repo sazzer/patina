@@ -13,7 +13,7 @@ use crate::{
 };
 
 /// Endpoint for getting a single User by ID.
-#[tracing::instrument(skip(user_service))]
+#[tracing::instrument(name = "GET /users/{id}", skip(user_service))]
 pub async fn get_user(
     path: Path<String>,
     user_service: Data<Arc<dyn GetUserUseCase>>,

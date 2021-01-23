@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// Endpoint for building the home document.
-#[tracing::instrument(skip(home_document))]
+#[tracing::instrument(name = "GET /", skip(home_document))]
 pub async fn home(home_document: Data<Arc<HomeDocument>>) -> Response<HalPayload<()>> {
     let payload = home_document.payload.clone();
 

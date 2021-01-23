@@ -9,7 +9,7 @@ use crate::{
 };
 
 /// Endpoint to start authentication with the requested provider.
-#[tracing::instrument(skip(service))]
+#[tracing::instrument(name = "GET /authentication/{provider}", skip(service))]
 pub async fn start(
     path: Path<String>,
     service: Data<Arc<dyn StartAuthenticationUseCase>>,

@@ -6,7 +6,7 @@ use super::model::SystemHealthResponse;
 use crate::{health::CheckHealthUseCase, http::response::Response};
 
 /// Endpoint for checking the health of the system.
-#[tracing::instrument(skip(health_service))]
+#[tracing::instrument(name = "GET /health", skip(health_service))]
 pub async fn check_health(
     health_service: Data<Arc<dyn CheckHealthUseCase>>,
 ) -> Response<SystemHealthResponse> {
