@@ -28,7 +28,7 @@ impl Provider for GoogleProvider {
             .set("client_id", self.client_id.clone())
             .set("response_type", "code")
             .set("scope", "openid email profile")
-            .set("redirect_url", self.redirect_url.clone())
+            .set("redirect_uri", self.redirect_url.clone())
             .set("state", nonce)
             .build()
     }
@@ -46,11 +46,11 @@ mod tests {
             client_id: "GoogleClientId".to_string(),
             client_secret: "GoogleClientSecret".to_string(),
             redirect_url: "http://localhost:8000/authentication/google/redirect".to_string(),
-            auth_url: "https://accounts.google.com/o/oauth2/v2/auth{?client_id,response_type,scope,redirect_url,state}".to_string(),
+            auth_url: "https://accounts.google.com/o/oauth2/v2/auth{?client_id,response_type,scope,redirect_uri,state}".to_string(),
             token_url: "https://www.googleapis.com/oauth2/v4/token".to_string()
         };
 
         let result = sut.start_authentication("GoogleNonce");
-        check!(result == "https://accounts.google.com/o/oauth2/v2/auth?client_id=GoogleClientId&response_type=code&scope=openid%20email%20profile&redirect_url=http%3A%2F%2Flocalhost%3A8000%2Fauthentication%2Fgoogle%2Fredirect&state=GoogleNonce");
+        check!(result == "https://accounts.google.com/o/oauth2/v2/auth?client_id=GoogleClientId&response_type=code&scope=openid%20email%20profile&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauthentication%2Fgoogle%2Fredirect&state=GoogleNonce");
     }
 }

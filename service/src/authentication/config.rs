@@ -7,7 +7,7 @@ use super::{
     endpoints::{configure_server, home_document_links},
     providers::Provider,
     service::AuthenticationService,
-    ListProvidersUseCase, ProviderId,
+    ListProvidersUseCase, ProviderId, StartAuthenticationUseCase,
 };
 use crate::{home::Contributor, http::hal::Link, server::Configurer};
 
@@ -43,6 +43,7 @@ pub fn builder() -> Builder {
 impl Configurer for Component {
     fn configure_server(&self, config: &mut ServiceConfig) {
         config.data(self.service.clone() as Arc<dyn ListProvidersUseCase>);
+        config.data(self.service.clone() as Arc<dyn StartAuthenticationUseCase>);
 
         configure_server(config);
     }

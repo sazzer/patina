@@ -5,7 +5,7 @@ use crate::authentication::{config::Builder, ProviderId};
 
 /// Default value for the Auth URL if not provided.
 const AUTH_URL_DEFAULT_VALUE: &str =
-    "https://accounts.google.com/o/oauth2/v2/auth{?client_id,response_type,scope,redirect_url,state}";
+    "https://accounts.google.com/o/oauth2/v2/auth{?client_id,response_type,scope,redirect_uri,state}";
 
 /// Default value for the Token URL if not provided.
 const TOKEN_URL_DEFAULT_VALUE: &str = "https://www.googleapis.com/oauth2/v4/token";
