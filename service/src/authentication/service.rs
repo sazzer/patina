@@ -1,8 +1,9 @@
+mod list;
+mod start;
+
 use std::{collections::HashMap, sync::Arc};
 
 use super::{providers::Provider, ProviderId};
-
-mod list;
 
 /// Service for managing authentication.
 pub struct AuthenticationService {
