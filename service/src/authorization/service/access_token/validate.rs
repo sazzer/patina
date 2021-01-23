@@ -9,6 +9,7 @@ use crate::authorization::{
 };
 
 impl ValidateAccessTokenUseCase for AccessTokenService {
+    #[tracing::instrument(skip(self))]
     fn validate_access_token(
         &self,
         access_token: AccessToken,

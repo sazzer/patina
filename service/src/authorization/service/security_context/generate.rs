@@ -6,6 +6,7 @@ use crate::authorization::{
 };
 
 impl GenerateSecurityContextUseCase for SecurityContextService {
+    #[tracing::instrument(skip(self))]
     fn generate_security_context(&self, principal: Principal) -> SecurityContext {
         let issued = Utc::now();
         let expires = issued + self.duration;

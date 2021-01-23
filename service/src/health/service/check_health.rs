@@ -7,6 +7,7 @@ use crate::health::{CheckHealthUseCase, ComponentHealth, SystemHealth};
 
 #[async_trait]
 impl CheckHealthUseCase for HealthService {
+    #[tracing::instrument(skip(self))]
     async fn check_health(&self) -> SystemHealth {
         let mut components = HashMap::new();
 

@@ -9,6 +9,7 @@ use crate::authorization::{AccessToken, GenerateAccessTokenUseCase, Principal, S
 const ISSUER: &str = "tag:patina,2021,authorization";
 
 impl GenerateAccessTokenUseCase for AccessTokenService {
+    #[tracing::instrument(skip(self))]
     fn generate_access_token(&self, security_context: SecurityContext) -> AccessToken {
         let claims = ClaimsSet::<()> {
             registered: RegisteredClaims {
