@@ -1,11 +1,12 @@
-use std::{
-    ops::{Deref, DerefMut},
-    str::FromStr,
-};
+use std::str::FromStr;
 
 use deadpool::managed::{Object, PoolError};
-use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
+use deadpool_postgres::{
+    ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod, Transaction,
+};
+use postgres_types::ToSql;
 use prometheus::{opts, IntGauge, Registry};
+use tokio_postgres::{Error, IsolationLevel, Row};
 
 /// Database connection that works in terms of Postgres.
 pub struct Database {
@@ -80,16 +81,44 @@ impl Drop for Connection {
     }
 }
 
-impl Deref for Connection {
-    type Target = Object<ClientWrapper, tokio_postgres::Error>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Connection {
+    /// Begin a new database transaction.
+    ///
+    /// # Returns
+    /// The transaction in which to perform requests.
+    pub async fn begin_transaction(&mut self) -> Transaction<'_> {
+        self.0
+            .build_transaction()
+            .isolation_level(IsolationLevel::Serializable)
+            .read_only(false)
+            .deferrable(false)
+            .start()
+            .await
+            .expect("Failed to start transaction")
     }
-}
 
-impl DerefMut for Connection {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+    /// Perform a query for a single row, returning an Option for the row or `None` if no row was
+    /// found.
+    ///
+    /// # Parameters
+    /// - `statement` - The SQL statement to perform
+    /// - `params` - The parameters to bind to the query
+    ///
+    /// # Returns
+    /// The row that is returned, or `None` if no row was returned.
+    pub async fn query_opt<T>(
+        &self,
+        statement: T,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Option<Row>, Error>
+    where
+        T: Into<String>,
+    {
+        let statement = statement.into();
+
+        let span = tracing::trace_span!("query", statement = statement.as_str());
+        let _enter = span.enter();
+
+        self.0.query_opt(statement.as_str(), params).await
     }
 }

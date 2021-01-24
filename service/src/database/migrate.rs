@@ -1,5 +1,4 @@
 use rust_embed::RustEmbed;
-use tokio_postgres::IsolationLevel;
 
 use super::Database;
 
@@ -16,14 +15,7 @@ struct Migrations;
 #[tracing::instrument(skip(d))]
 pub async fn migrate(d: &Database) {
     let mut conn = d.checkout().await;
-    let tx = conn
-        .build_transaction()
-        .isolation_level(IsolationLevel::Serializable)
-        .read_only(false)
-        .deferrable(false)
-        .start()
-        .await
-        .expect("Failed to start transaction");
+    let tx = conn.begin_transaction().await;
 
     create_migrations_table(&tx).await;
     apply_migrations(&tx).await;
