@@ -5,12 +5,12 @@ use std::{
 
 use deadpool::managed::{Object, PoolError};
 use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
-use prometheus::{opts, IntCounter, Registry};
+use prometheus::{opts, IntGauge, Registry};
 
 /// Database connection that works in terms of Postgres.
 pub struct Database {
     pool:             Pool,
-    checkout_counter: IntCounter,
+    checkout_counter: IntGauge,
 }
 
 impl Database {
@@ -29,7 +29,7 @@ impl Database {
 
         let counter_opts =
             opts!("checkout", "Number of connections checked out").namespace("postgres");
-        let checkout_counter = IntCounter::with_opts(counter_opts).unwrap();
+        let checkout_counter = IntGauge::with_opts(counter_opts).unwrap();
 
         prometheus
             .register(Box::new(checkout_counter.clone()))
@@ -51,7 +51,10 @@ impl Database {
     pub async fn try_checkout(&self) -> Result<Connection, PoolError<tokio_postgres::Error>> {
         self.checkout_counter.inc();
 
-        self.pool.get().await.map(Connection)
+        self.pool
+            .get()
+            .await
+            .map(|conn| Connection(conn, self.checkout_counter.clone()))
     }
 
     /// Check out a connection from the database pool in order to make queries
@@ -69,7 +72,13 @@ impl Database {
 }
 
 /// Wrapper around a database connection.
-pub struct Connection(Object<ClientWrapper, tokio_postgres::Error>);
+pub struct Connection(Object<ClientWrapper, tokio_postgres::Error>, IntGauge);
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        self.1.dec()
+    }
+}
 
 impl Deref for Connection {
     type Target = Object<ClientWrapper, tokio_postgres::Error>;
