@@ -1,11 +1,11 @@
-use std::str::FromStr;
+use std::{
+    ops::{Deref, DerefMut},
+    str::FromStr,
+};
 
-use async_trait::async_trait;
-use deadpool::managed::Object;
+use deadpool::managed::{Object, PoolError};
 use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
 use prometheus::{opts, IntCounter, Registry};
-
-use crate::health::HealthCheckable;
 
 /// Database connection that works in terms of Postgres.
 pub struct Database {
@@ -48,27 +48,39 @@ impl Database {
     ///
     /// # Errors
     /// If the pool is unable to return a viable connection
-    pub async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error> {
+    pub async fn try_checkout(&self) -> Result<Connection, PoolError<tokio_postgres::Error>> {
         self.checkout_counter.inc();
 
-        self.pool
-            .get()
+        self.pool.get().await.map(Connection)
+    }
+
+    /// Check out a connection from the database pool in order to make queries
+    ///
+    /// # Returns
+    /// The connection to use
+    ///
+    /// # Errors
+    /// If the pool is unable to return a viable connection
+    pub async fn checkout(&self) -> Connection {
+        self.try_checkout()
             .await
             .expect("Failed to get database connection")
     }
 }
 
-#[async_trait]
-impl HealthCheckable for Database {
-    async fn check_health(&self) -> Result<(), String> {
-        self.checkout_counter.inc();
+/// Wrapper around a database connection.
+pub struct Connection(Object<ClientWrapper, tokio_postgres::Error>);
 
-        let conn = self.pool.get().await.map_err(|e| e.to_string())?;
+impl Deref for Connection {
+    type Target = Object<ClientWrapper, tokio_postgres::Error>;
 
-        conn.simple_query("SELECT 1")
-            .await
-            .map_err(|e| e.to_string())?;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
-        Ok(())
+impl DerefMut for Connection {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
