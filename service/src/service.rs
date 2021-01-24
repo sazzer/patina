@@ -32,7 +32,7 @@ impl Service {
             .build();
         let health = crate::health::config::builder()
             .with_component("db", database)
-            .build();
+            .build(&prometheus);
         let home = crate::home::config::builder()
             .with_component(health.clone())
             .with_component(authentication.clone())

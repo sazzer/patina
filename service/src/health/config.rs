@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use actix_web::web::ServiceConfig;
+use prometheus::Registry;
 
 use super::{
     endpoints::{configure_server, home_document_links},
@@ -26,10 +27,10 @@ impl Builder {
     }
 
     /// Build the component.
-    pub fn build(self) -> Arc<Component> {
+    pub fn build(self, prometheus: &Registry) -> Arc<Component> {
         tracing::debug!("Built health service");
 
-        let service = Arc::new(HealthService::new(self.components));
+        let service = Arc::new(HealthService::new(self.components, prometheus));
         Arc::new(Component { service })
     }
 }
