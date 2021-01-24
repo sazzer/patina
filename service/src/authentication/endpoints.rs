@@ -1,3 +1,4 @@
+mod complete;
 mod list_providers;
 mod model;
 mod start;
@@ -10,6 +11,9 @@ use crate::http::hal::Link;
 pub fn configure_server(config: &mut ServiceConfig) {
     config.service(resource("/authentication").route(get().to(list_providers::list_providers)));
     config.service(resource("/authentication/{provider}").route(get().to(start::start)));
+    config.service(
+        resource("/authentication/{provider}/complete").route(get().to(complete::complete)),
+    );
 }
 
 /// Produce the links that should be contributed to the home document.
