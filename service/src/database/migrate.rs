@@ -1,6 +1,6 @@
 use rust_embed::RustEmbed;
 
-use super::Database;
+use super::{Database, Transaction};
 
 /// The embedded migrations files to apply
 #[derive(RustEmbed)]
@@ -12,7 +12,7 @@ struct Migrations;
 ///
 /// # Parameters
 /// - `d` - The database to migrate
-#[tracing::instrument(skip(d))]
+#[tracing::instrument(name = "database::migrate", skip(d))]
 pub async fn migrate(d: &Database) {
     let mut conn = d.checkout().await;
     let tx = conn.begin_transaction().await;
@@ -27,7 +27,7 @@ pub async fn migrate(d: &Database) {
 ///
 /// # Parameters
 /// - `tx` An open database transaction in which to execute the SQL.
-async fn create_migrations_table(tx: &tokio_postgres::Transaction<'_>) {
+async fn create_migrations_table(tx: &Transaction<'_>) {
     tracing::trace!("Ensuring the migrations table exists");
     tx.execute(
         "CREATE TABLE IF NOT EXISTS __migrations(
@@ -75,7 +75,7 @@ fn list_all_migrations() -> Vec<String> {
 ///
 /// # Errors
 /// If an error occurs executing the SQL then return an error
-async fn list_applied_migrations(tx: &tokio_postgres::Transaction<'_>) -> Vec<String> {
+async fn list_applied_migrations(tx: &Transaction<'_>) -> Vec<String> {
     tracing::trace!("Listing the applied migrations");
 
     let migrations = tx
@@ -100,7 +100,7 @@ async fn list_applied_migrations(tx: &tokio_postgres::Transaction<'_>) -> Vec<St
 ///
 /// # Errors
 /// If an error occurs applying the migrations then return an error
-async fn apply_migrations(tx: &tokio_postgres::Transaction<'_>) {
+async fn apply_migrations(tx: &Transaction<'_>) {
     let all_migrations = list_all_migrations();
     let applied_migrations = list_applied_migrations(tx).await;
 
@@ -109,6 +109,10 @@ async fn apply_migrations(tx: &tokio_postgres::Transaction<'_>) {
         if applied_migrations.contains(migration) {
             tracing::debug!(migration = ?migration, "Migration already applied");
         } else {
+            let span =
+                tracing::trace_span!("database::apply_migration", migration = migration.as_str());
+            let _enter = span.enter();
+
             tracing::debug!(migration = ?migration, "Applying migration");
             let contents = Migrations::get(migration).expect("Failed to load migration");
 

@@ -1,9 +1,7 @@
 use std::str::FromStr;
 
 use deadpool::managed::{Object, PoolError};
-use deadpool_postgres::{
-    ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod, Transaction,
-};
+use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
 use postgres_types::ToSql;
 use prometheus::{opts, IntGauge, Registry};
 use tokio_postgres::{Error, IsolationLevel, Row};
@@ -15,6 +13,7 @@ pub struct Database {
 }
 
 impl Database {
+    #[tracing::instrument(name = "Database::new", skip(prometheus))]
     pub async fn new(url: &str, prometheus: &Registry) -> Self {
         let pg_config = tokio_postgres::Config::from_str(url).expect("Invalid database URL");
 
@@ -49,6 +48,7 @@ impl Database {
     ///
     /// # Errors
     /// If the pool is unable to return a viable connection
+    #[tracing::instrument(name = "Database::try_checkout", skip(self))]
     pub async fn try_checkout(&self) -> Result<Connection, PoolError<tokio_postgres::Error>> {
         self.checkout_counter.inc();
 
@@ -86,15 +86,18 @@ impl Connection {
     ///
     /// # Returns
     /// The transaction in which to perform requests.
+    #[tracing::instrument(name = "Connection::begin_transaction", skip(self))]
     pub async fn begin_transaction(&mut self) -> Transaction<'_> {
-        self.0
-            .build_transaction()
-            .isolation_level(IsolationLevel::Serializable)
-            .read_only(false)
-            .deferrable(false)
-            .start()
-            .await
-            .expect("Failed to start transaction")
+        Transaction(
+            self.0
+                .build_transaction()
+                .isolation_level(IsolationLevel::Serializable)
+                .read_only(false)
+                .deferrable(false)
+                .start()
+                .await
+                .expect("Failed to start transaction"),
+        )
     }
 
     /// Perform a query for a single row, returning an Option for the row or `None` if no row was
@@ -116,9 +119,96 @@ impl Connection {
     {
         let statement = statement.into();
 
-        let span = tracing::trace_span!("query", statement = statement.as_str());
+        let span = tracing::trace_span!("Connection::query_opt", statement = statement.as_str());
         let _enter = span.enter();
 
         self.0.query_opt(statement.as_str(), params).await
+    }
+}
+
+pub struct Transaction<'a>(deadpool_postgres::Transaction<'a>);
+
+impl<'a> Transaction<'a> {
+    #[tracing::instrument(name = "Transaction::commit", skip(self))]
+    pub async fn commit(self) -> Result<(), tokio_postgres::Error> {
+        self.0.commit().await
+    }
+
+    pub async fn execute<S>(
+        &self,
+        statement: S,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> Result<u64, tokio_postgres::Error>
+    where
+        S: Into<String>,
+    {
+        let statement = statement.into();
+
+        let span = tracing::trace_span!("Transaction::execute", statement = statement.as_str());
+        let _enter = span.enter();
+
+        self.0.execute(statement.as_str(), params).await
+    }
+
+    pub async fn batch_execute<S>(&self, statement: S) -> Result<(), tokio_postgres::Error>
+    where
+        S: Into<String>,
+    {
+        let statement = statement.into();
+
+        let span =
+            tracing::trace_span!("Transaction::batch_execute", statement = statement.as_str());
+        let _enter = span.enter();
+
+        self.0.batch_execute(statement.as_str()).await
+    }
+
+    /// Perform a query for a single row, returning an Option for the row or `None` if no row was
+    /// found.
+    ///
+    /// # Parameters
+    /// - `statement` - The SQL statement to perform
+    /// - `params` - The parameters to bind to the query
+    ///
+    /// # Returns
+    /// The row that is returned, or `None` if no row was returned.
+    pub async fn query_opt<T>(
+        &self,
+        statement: T,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Option<Row>, Error>
+    where
+        T: Into<String>,
+    {
+        let statement = statement.into();
+
+        let span = tracing::trace_span!("Transaction::query_opt", statement = statement.as_str());
+        let _enter = span.enter();
+
+        self.0.query_opt(statement.as_str(), params).await
+    }
+
+    /// Perform a query for a set of rows, returning all of the rows that matched.
+    ///
+    /// # Parameters
+    /// - `statement` - The SQL statement to perform
+    /// - `params` - The parameters to bind to the query
+    ///
+    /// # Returns
+    /// The rows that are returned.
+    pub async fn query<T>(
+        &self,
+        statement: T,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Vec<Row>, Error>
+    where
+        T: Into<String>,
+    {
+        let statement = statement.into();
+
+        let span = tracing::trace_span!("Transaction::query", statement = statement.as_str());
+        let _enter = span.enter();
+
+        self.0.query(statement.as_str(), params).await
     }
 }

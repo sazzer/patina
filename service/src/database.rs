@@ -1,6 +1,6 @@
 pub mod config;
+mod health;
 mod migrate;
 mod postgres;
-mod health;
 
-pub use postgres::Database;
+pub use postgres::*;
