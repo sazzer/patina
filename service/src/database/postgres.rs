@@ -119,10 +119,23 @@ impl Connection {
     {
         let statement = statement.into();
 
-        let span = tracing::trace_span!("Connection::query_opt", statement = statement.as_str());
+        let span = tracing::trace_span!(
+            "Connection::query_opt",
+            statement = statement.as_str(),
+            found = tracing::field::Empty,
+            error = tracing::field::Empty,
+        );
         let _enter = span.enter();
 
-        self.0.query_opt(statement.as_str(), params).await
+        let result = self.0.query_opt(statement.as_str(), params).await;
+
+        match &result {
+            Ok(Some(_)) => span.record("found", &true),
+            Ok(None) => span.record("found", &false),
+            Err(e) => span.record("error", &e.to_string().as_str()),
+        };
+
+        result
     }
 }
 
@@ -144,10 +157,22 @@ impl<'a> Transaction<'a> {
     {
         let statement = statement.into();
 
-        let span = tracing::trace_span!("Transaction::execute", statement = statement.as_str());
+        let span = tracing::trace_span!(
+            "Transaction::execute",
+            statement = statement.as_str(),
+            rows = tracing::field::Empty,
+            error = tracing::field::Empty
+        );
         let _enter = span.enter();
 
-        self.0.execute(statement.as_str(), params).await
+        let result = self.0.execute(statement.as_str(), params).await;
+
+        match &result {
+            Ok(rows) => span.record("rows", &rows),
+            Err(e) => span.record("error", &e.to_string().as_str()),
+        };
+
+        result
     }
 
     pub async fn batch_execute<S>(&self, statement: S) -> Result<(), tokio_postgres::Error>
@@ -156,11 +181,20 @@ impl<'a> Transaction<'a> {
     {
         let statement = statement.into();
 
-        let span =
-            tracing::trace_span!("Transaction::batch_execute", statement = statement.as_str());
+        let span = tracing::trace_span!(
+            "Transaction::batch_execute",
+            statement = statement.as_str(),
+            error = tracing::field::Empty
+        );
         let _enter = span.enter();
 
-        self.0.batch_execute(statement.as_str()).await
+        let result = self.0.batch_execute(statement.as_str()).await;
+
+        if let Err(e) = &result {
+            span.record("error", &e.to_string().as_str());
+        }
+
+        result
     }
 
     /// Perform a query for a single row, returning an Option for the row or `None` if no row was
@@ -185,7 +219,15 @@ impl<'a> Transaction<'a> {
         let span = tracing::trace_span!("Transaction::query_opt", statement = statement.as_str());
         let _enter = span.enter();
 
-        self.0.query_opt(statement.as_str(), params).await
+        let result = self.0.query_opt(statement.as_str(), params).await;
+
+        match &result {
+            Ok(Some(_)) => span.record("found", &true),
+            Ok(None) => span.record("found", &false),
+            Err(e) => span.record("error", &e.to_string().as_str()),
+        };
+
+        result
     }
 
     /// Perform a query for a set of rows, returning all of the rows that matched.
@@ -206,9 +248,21 @@ impl<'a> Transaction<'a> {
     {
         let statement = statement.into();
 
-        let span = tracing::trace_span!("Transaction::query", statement = statement.as_str());
+        let span = tracing::trace_span!(
+            "Transaction::query",
+            statement = statement.as_str(),
+            rows = tracing::field::Empty,
+            error = tracing::field::Empty
+        );
         let _enter = span.enter();
 
-        self.0.query(statement.as_str(), params).await
+        let result = self.0.query(statement.as_str(), params).await;
+
+        match &result {
+            Ok(rows) => span.record("rows", &rows.len()),
+            Err(e) => span.record("error", &e.to_string().as_str()),
+        };
+
+        result
     }
 }
