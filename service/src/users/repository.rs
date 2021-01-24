@@ -8,7 +8,7 @@ use crate::database::Database;
 /// Repository for accessing the users data
 pub struct Repository {
     /// The database connection.
-    database: Arc<dyn Database>,
+    database: Arc<Database>,
 }
 
 impl Repository {
@@ -16,7 +16,7 @@ impl Repository {
     ///
     /// # Parameters
     /// - `database` - The database connection
-    pub fn new(database: Arc<dyn Database>) -> Self {
+    pub fn new(database: Arc<Database>) -> Self {
         Self { database }
     }
 }

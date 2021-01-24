@@ -13,7 +13,7 @@ pub struct Component {
 }
 
 /// Construct a new users component.
-pub fn new(database: Arc<dyn Database>) -> Arc<Component> {
+pub fn new(database: Arc<Database>) -> Arc<Component> {
     tracing::debug!("Building users service");
     let repository = Repository::new(database);
     let service = UsersService::new(repository);

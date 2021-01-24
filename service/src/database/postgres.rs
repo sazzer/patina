@@ -5,16 +5,15 @@ use deadpool::managed::Object;
 use deadpool_postgres::{ClientWrapper, Manager, ManagerConfig, Pool, RecyclingMethod};
 use prometheus::{opts, IntCounter, Registry};
 
-use super::Database;
 use crate::health::HealthCheckable;
 
 /// Database connection that works in terms of Postgres.
-pub struct Postgres {
+pub struct Database {
     pool:             Pool,
     checkout_counter: IntCounter,
 }
 
-impl Postgres {
+impl Database {
     pub async fn new(url: &str, prometheus: &Registry) -> Self {
         let pg_config = tokio_postgres::Config::from_str(url).expect("Invalid database URL");
 
@@ -41,11 +40,15 @@ impl Postgres {
             checkout_counter,
         }
     }
-}
 
-#[async_trait]
-impl Database for Postgres {
-    async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error> {
+    /// Check out a connection from the database pool in order to make queries
+    ///
+    /// # Returns
+    /// The connection to use
+    ///
+    /// # Errors
+    /// If the pool is unable to return a viable connection
+    pub async fn checkout(&self) -> Object<ClientWrapper, tokio_postgres::Error> {
         self.checkout_counter.inc();
 
         self.pool
@@ -56,7 +59,7 @@ impl Database for Postgres {
 }
 
 #[async_trait]
-impl HealthCheckable for Postgres {
+impl HealthCheckable for Database {
     async fn check_health(&self) -> Result<(), String> {
         self.checkout_counter.inc();
 

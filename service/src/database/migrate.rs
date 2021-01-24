@@ -14,7 +14,7 @@ struct Migrations;
 /// # Parameters
 /// - `d` - The database to migrate
 #[tracing::instrument(skip(d))]
-pub async fn migrate(d: &dyn Database) {
+pub async fn migrate(d: &Database) {
     let mut conn = d.checkout().await;
     let tx = conn
         .build_transaction()
