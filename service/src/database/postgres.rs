@@ -197,39 +197,6 @@ impl<'a> Transaction<'a> {
         result
     }
 
-    /// Perform a query for a single row, returning an Option for the row or `None` if no row was
-    /// found.
-    ///
-    /// # Parameters
-    /// - `statement` - The SQL statement to perform
-    /// - `params` - The parameters to bind to the query
-    ///
-    /// # Returns
-    /// The row that is returned, or `None` if no row was returned.
-    pub async fn query_opt<T>(
-        &self,
-        statement: T,
-        params: &[&(dyn ToSql + Sync)],
-    ) -> Result<Option<Row>, Error>
-    where
-        T: Into<String>,
-    {
-        let statement = statement.into();
-
-        let span = tracing::trace_span!("Transaction::query_opt", statement = statement.as_str());
-        let _enter = span.enter();
-
-        let result = self.0.query_opt(statement.as_str(), params).await;
-
-        match &result {
-            Ok(Some(_)) => span.record("found", &true),
-            Ok(None) => span.record("found", &false),
-            Err(e) => span.record("error", &e.to_string().as_str()),
-        };
-
-        result
-    }
-
     /// Perform a query for a set of rows, returning all of the rows that matched.
     ///
     /// # Parameters

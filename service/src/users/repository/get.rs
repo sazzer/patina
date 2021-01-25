@@ -34,7 +34,7 @@ impl Repository {
         authentication_service: AuthenticationService,
         authentication_id: AuthenticationId,
     ) -> Option<UserResource> {
-        let conn = self.database.checkout().await;
+        let _conn = self.database.checkout().await;
 
         None
     }

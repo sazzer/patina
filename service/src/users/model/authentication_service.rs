@@ -9,6 +9,7 @@ impl AuthenticationService {
     ///
     /// # Parameters
     /// - `value` - The name of the authentication service
+    #[allow(dead_code)] // TODO: For now
     pub fn new<S>(value: S) -> Self
     where
         S: Into<String>,

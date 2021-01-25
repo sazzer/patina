@@ -41,7 +41,7 @@ pub async fn complete(
         .ok_or_else(|| Problem::from(NOT_FOUND).with_extra("why", "Missing nonce"))?; // Cookie is missing
 
     // Actually complete authentication
-    let authenticated_user = authentication_service
+    let _authenticated_user = authentication_service
         .complete_authentication(&ProviderId::new(&path.0), &authentication_nonce, params.0)
         .await?;
 

@@ -16,7 +16,7 @@ impl CompleteAuthenticationUseCase for AuthenticationService {
         _nonce: &str,
         _params: HashMap<String, String>,
     ) -> Result<UserResource, CompleteAuthenticationError> {
-        let provider = self
+        let _provider = self
             .providers
             .get(provider_id)
             .ok_or(CompleteAuthenticationError::UnknownProvider)?;
