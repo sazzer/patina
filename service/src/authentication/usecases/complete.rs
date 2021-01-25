@@ -18,14 +18,18 @@ pub trait CompleteAuthenticationUseCase {
     /// The details of the user that has just authenticated.
     async fn complete_authentication(
         &self,
-        provider: ProviderId,
-        nonce: String,
+        provider: &ProviderId,
+        nonce: &str,
         params: HashMap<String, String>,
     ) -> Result<UserResource, CompleteAuthenticationError>;
 }
 /// Errors that can occur when completing authentication.
 #[derive(Debug, PartialEq, thiserror::Error)]
 pub enum CompleteAuthenticationError {
+    /// The requested provider is unknown.
+    #[error("The requested provider was unknown")]
+    UnknownProvider,
+
     #[error("An unexpected error occurred")]
     Unexpected,
 }

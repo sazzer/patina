@@ -42,7 +42,7 @@ pub async fn complete(
 
     // Actually complete authentication
     let authenticated_user = authentication_service
-        .complete_authentication(ProviderId::new(&path.0), authentication_nonce, params.0)
+        .complete_authentication(&ProviderId::new(&path.0), &authentication_nonce, params.0)
         .await?;
 
     Err(Problem::from(NOT_FOUND).with_extra("why", "Success"))
@@ -50,10 +50,6 @@ pub async fn complete(
 
 impl From<CompleteAuthenticationError> for Problem {
     fn from(err: CompleteAuthenticationError) -> Self {
-        match err {
-            CompleteAuthenticationError::Unexpected => {
-                Self::from(NOT_FOUND).with_extra("why", "Unexpected error")
-            },
-        }
+        Self::from(NOT_FOUND).with_extra("why", format!("{:?}", err))
     }
 }
