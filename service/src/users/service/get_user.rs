@@ -15,4 +15,12 @@ impl GetUserUseCase for UsersService {
 
         user
     }
+
+    async fn get_user_by_authentication(
+        &self,
+        authentication_service: crate::users::AuthenticationService,
+        authentication_id: crate::users::AuthenticationId,
+    ) -> Option<UserResource> {
+        todo!()
+    }
 }
