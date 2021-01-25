@@ -14,7 +14,7 @@ impl Service {
     pub async fn new() -> Self {
         let _ = env_logger::try_init();
 
-        let database = patina_testdatabase::TestDatabase::default();
+        let database = patina_testdatabase::TestDatabase::new();
 
         let settings = patina::Settings {
             database: patina::DatabaseSettings {

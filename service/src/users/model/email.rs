@@ -5,7 +5,7 @@ use postgres_types::{accepts, to_sql_checked, FromSql, IsNull, ToSql, Type};
 use serde::Serialize;
 
 /// The email address of a user.
-#[derive(Debug, Serialize, FromSql)]
+#[derive(Debug, PartialEq, Serialize, FromSql)]
 pub struct Email(String);
 
 /// Errors that can occur when parsing an string into an `Email`.

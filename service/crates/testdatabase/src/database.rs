@@ -20,9 +20,10 @@ pub struct TestDatabase {
     pub url:  String,
 }
 
-impl Default for TestDatabase {
+impl TestDatabase {
     /// Construct a new test database.
-    fn default() -> Self {
+    #[allow(clippy::new_without_default)] // This is a non-trivial implementation. Hiding it behind default() is unwise.
+    pub fn new() -> Self {
         tracing::info!("Starting Postgres database");
         let node = DOCKER.run(Postgres::default());
 
@@ -31,11 +32,14 @@ impl Default for TestDatabase {
         let url = format!("postgres://postgres@{}:{}", host, port);
         tracing::info!(url = ?url, "Running postgres");
 
-        Self { node, host, port, url }
+        Self {
+            node,
+            host,
+            port,
+            url,
+        }
     }
-}
 
-impl TestDatabase {
     /// Seed some data into the database
     ///
     /// # Parameters
