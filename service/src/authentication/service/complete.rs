@@ -10,6 +10,7 @@ use crate::{
 
 #[async_trait]
 impl CompleteAuthenticationUseCase for AuthenticationService {
+    #[tracing::instrument(skip(self))]
     async fn complete_authentication(
         &self,
         provider_id: &ProviderId,

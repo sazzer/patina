@@ -1,3 +1,4 @@
+mod claims;
 pub mod config;
 
 use std::collections::HashMap;
@@ -5,6 +6,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use uritemplate::UriTemplate;
 
+use self::claims::GoogleToken;
 use super::{AuthenticatedUser, CompleteAuthenticationError, Provider};
 
 /// Authentication provider for working with Google.
@@ -25,6 +27,7 @@ pub struct GoogleProvider {
 
 #[async_trait]
 impl Provider for GoogleProvider {
+    #[tracing::instrument(skip(self))]
     fn start_authentication(&self, nonce: &str) -> String {
         UriTemplate::new(&self.auth_url)
             .set("client_id", self.client_id.clone())
@@ -35,11 +38,56 @@ impl Provider for GoogleProvider {
             .build()
     }
 
+    #[tracing::instrument(skip(self))]
     async fn complete_authentication(
         &self,
-        _nonce: &str,
-        _params: HashMap<String, String>,
+        nonce: &str,
+        params: HashMap<String, String>,
     ) -> Result<AuthenticatedUser, CompleteAuthenticationError> {
+        let state = params.get("state").ok_or_else(|| {
+            tracing::warn!("State parameter is missing");
+            CompleteAuthenticationError::MissingParameter("state".to_owned())
+        })?;
+        if state != nonce {
+            tracing::warn!("State parameter is present but has the wrong value");
+            return Err(CompleteAuthenticationError::InvalidNonce);
+        }
+
+        let auth_code = params.get("code").ok_or_else(|| {
+            tracing::warn!("Authorization code parameter is missing");
+            CompleteAuthenticationError::MissingParameter("code".to_owned())
+        })?;
+        let params = [
+            ("grant_type", "authorization_code"),
+            ("client_id", self.client_id.as_ref()),
+            ("client_secret", self.client_secret.as_ref()),
+            ("redirect_uri", self.redirect_url.as_ref()),
+            ("code", auth_code),
+        ];
+
+        let client = reqwest::Client::new();
+        let response = client
+            .post(&self.token_url)
+            .form(&params)
+            .send()
+            .await
+            .map_err(|e| CompleteAuthenticationError::AuthenticationFailed(e.to_string()))?;
+
+        tracing::debug!(response = ?response, "Response from Google");
+
+        if response.status() != reqwest::StatusCode::OK {
+            let body = response.text().await.unwrap();
+            tracing::warn!("Unsuccessful response received from Google: {}", body);
+            return Err(CompleteAuthenticationError::AuthenticationFailed(
+                "Unsuccessful response received from Google".to_owned(),
+            ));
+        }
+        let body: GoogleToken = response
+            .json()
+            .await
+            .map_err(|e| CompleteAuthenticationError::AuthenticationFailed(e.to_string()))?;
+        tracing::debug!("Response Body from Google: {:?}", body);
+
         Err(CompleteAuthenticationError::Unexpected)
     }
 }

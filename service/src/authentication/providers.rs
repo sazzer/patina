@@ -52,6 +52,15 @@ pub struct AuthenticatedUser {
 /// Errors that can occur when attempting to complete authentication
 #[derive(Debug, PartialEq, thiserror::Error)]
 pub enum CompleteAuthenticationError {
+    #[error("The provided nonce is invalid")]
+    InvalidNonce,
+
+    #[error("A required parameter is missing: {0}")]
+    MissingParameter(String),
+
+    #[error("Authentication with the provider failed")]
+    AuthenticationFailed(String),
+
     #[error("An unexpected error occurred")]
     Unexpected,
 }
