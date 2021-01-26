@@ -99,4 +99,60 @@ mod tests {
 
         check!(user.is_none());
     }
+
+    #[actix_rt::test]
+    async fn get_user_by_authentication_when_user_is_known_then_found() {
+        let seed_user = SeedUser {
+            user_id: "384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3".parse().unwrap(),
+            version: "a76b376a-9ca9-4b90-bb20-c5c5133d2ba7".parse().unwrap(),
+            display_name: "Test User".to_string(),
+            email: "test@example.com".to_string(),
+            ..SeedUser::default()
+        }
+        .with_authentication("google", "123456", "test@example.com");
+
+        let test_database = TestDatabase::new().await;
+        test_database.test_database.seed(&seed_user).await;
+
+        let service = UsersService::new(Repository::new(test_database.database));
+
+        let user = service
+            .get_user_by_authentication(
+                AuthenticationService::new("google"),
+                AuthenticationId::new("123456"),
+            )
+            .await;
+
+        let_assert!(Some(user) = user);
+        check!(user.identity.version == "a76b376a-9ca9-4b90-bb20-c5c5133d2ba7".parse().unwrap());
+        check!(user.data.email == "test@example.com".parse().unwrap());
+        check!(user.data.display_name == "Test User");
+    }
+
+    #[actix_rt::test]
+    async fn get_user_by_authentication_when_user_authentication_details_cross_then_not_found() {
+        let seed_user = SeedUser {
+            user_id: "384a7b7f-8ec2-4f73-9dae-4eb4f7b178b3".parse().unwrap(),
+            version: "a76b376a-9ca9-4b90-bb20-c5c5133d2ba7".parse().unwrap(),
+            display_name: "Test User".to_string(),
+            email: "test@example.com".to_string(),
+            ..SeedUser::default()
+        }
+        .with_authentication("google", "123456", "test@example.com")
+        .with_authentication("twitter", "abcdef", "test@example.com");
+
+        let test_database = TestDatabase::new().await;
+        test_database.test_database.seed(&seed_user).await;
+
+        let service = UsersService::new(Repository::new(test_database.database));
+
+        let user = service
+            .get_user_by_authentication(
+                AuthenticationService::new("google"),
+                AuthenticationId::new("abcdef"),
+            )
+            .await;
+
+        check!(user.is_none());
+    }
 }

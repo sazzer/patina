@@ -1,3 +1,5 @@
+use serde_json::json;
+
 use super::Repository;
 use crate::users::{AuthenticationId, AuthenticationService, UserID, UserResource};
 
@@ -34,8 +36,25 @@ impl Repository {
         authentication_service: AuthenticationService,
         authentication_id: AuthenticationId,
     ) -> Option<UserResource> {
-        let _conn = self.database.checkout().await;
+        let conn = self.database.checkout().await;
 
-        None
+        let authentication = json!(
+            [
+                {
+                    "service": authentication_service,
+                    "id": authentication_id
+                }
+            ]
+        );
+
+        let row = conn
+            .query_opt(
+                "SELECT * FROM users WHERE authentications @> $1",
+                &[&authentication],
+            )
+            .await
+            .expect("Failed to query database")?;
+
+        Some(row.into())
     }
 }
