@@ -32,15 +32,27 @@ mod tests {
     use std::{collections::HashMap, sync::Arc};
 
     use assert2::{check, let_assert};
+    use async_trait::async_trait;
 
     use super::*;
-    use crate::authentication::providers::Provider;
+    use crate::authentication::providers::{
+        AuthenticatedUser, CompleteAuthenticationError, Provider,
+    };
 
     struct MockProvider {}
 
+    #[async_trait]
     impl Provider for MockProvider {
         fn start_authentication(&self, nonce: &str) -> String {
             format!("http://result.example.com/{}", nonce)
+        }
+
+        async fn complete_authentication(
+            &self,
+            _nonce: &str,
+            _params: HashMap<String, String>,
+        ) -> Result<AuthenticatedUser, CompleteAuthenticationError> {
+            todo!()
         }
     }
 

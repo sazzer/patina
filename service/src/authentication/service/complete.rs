@@ -13,13 +13,15 @@ impl CompleteAuthenticationUseCase for AuthenticationService {
     async fn complete_authentication(
         &self,
         provider_id: &ProviderId,
-        _nonce: &str,
-        _params: HashMap<String, String>,
+        nonce: &str,
+        params: HashMap<String, String>,
     ) -> Result<UserResource, CompleteAuthenticationError> {
-        let _provider = self
+        let provider = self
             .providers
             .get(provider_id)
             .ok_or(CompleteAuthenticationError::UnknownProvider)?;
+
+        let _authenticated_user = provider.complete_authentication(nonce, params).await;
 
         Err(CompleteAuthenticationError::Unexpected)
     }

@@ -1,9 +1,11 @@
 pub mod config;
 
+use std::collections::HashMap;
+
 use async_trait::async_trait;
 use uritemplate::UriTemplate;
 
-use super::Provider;
+use super::{AuthenticatedUser, CompleteAuthenticationError, Provider};
 
 /// Authentication provider for working with Google.
 pub struct GoogleProvider {
@@ -31,6 +33,14 @@ impl Provider for GoogleProvider {
             .set("redirect_uri", self.redirect_url.clone())
             .set("state", nonce)
             .build()
+    }
+
+    async fn complete_authentication(
+        &self,
+        _nonce: &str,
+        _params: HashMap<String, String>,
+    ) -> Result<AuthenticatedUser, CompleteAuthenticationError> {
+        Err(CompleteAuthenticationError::Unexpected)
     }
 }
 
