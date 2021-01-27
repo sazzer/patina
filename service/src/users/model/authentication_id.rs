@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// The identity of the user at the authentication service.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct AuthenticationId(String);
 
 impl AuthenticationId {

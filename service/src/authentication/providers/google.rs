@@ -1,7 +1,7 @@
 mod claims;
 pub mod config;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, convert::TryInto};
 
 use async_trait::async_trait;
 use uritemplate::UriTemplate;
@@ -88,7 +88,10 @@ impl Provider for GoogleProvider {
             .map_err(|e| CompleteAuthenticationError::AuthenticationFailed(e.to_string()))?;
         tracing::debug!("Response Body from Google: {:?}", body);
 
-        Err(CompleteAuthenticationError::Unexpected)
+        let user = body.try_into()?;
+        tracing::debug!(user = ?user, "Authenticated as user");
+
+        Ok(user)
     }
 }
 

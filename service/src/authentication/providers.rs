@@ -60,7 +60,4 @@ pub enum CompleteAuthenticationError {
 
     #[error("Authentication with the provider failed")]
     AuthenticationFailed(String),
-
-    #[error("An unexpected error occurred")]
-    Unexpected,
 }
