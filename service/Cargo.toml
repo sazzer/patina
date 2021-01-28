@@ -49,3 +49,4 @@ mockito = "0.29.0"
 [package.metadata.commands]
 clippy = "find . -name *.rs | grep -v target | xargs touch; cargo clippy"
 psql = "PGPASSWORD=patina psql --host localhost --port 45432 --username patina"
+docker = "docker build -t patina-service ."
