@@ -44,6 +44,7 @@ assert2 = "0.3.3"
 insta = "1.5.2"
 patina-testdatabase = { path = './crates/testdatabase'}
 test-case = "1.1.0"
+mockito = "0.29.0"
 
 [package.metadata.commands]
 clippy = "find . -name *.rs | grep -v target | xargs touch; cargo clippy"
