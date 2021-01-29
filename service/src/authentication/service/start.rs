@@ -38,6 +38,7 @@ mod tests {
     use crate::authentication::providers::{
         AuthenticatedUser, CompleteAuthenticationError, Provider,
     };
+    use crate::users::MockGetUserUseCase;
 
     struct MockProvider {}
 
@@ -59,7 +60,8 @@ mod tests {
     #[test]
     fn start_authentication_given_unknown_provider_is_an_error() {
         let providers = HashMap::new();
-        let sut = AuthenticationService::new(providers);
+        let get_user_use_case = Arc::new(MockGetUserUseCase::new());
+        let sut = AuthenticationService::new(providers, get_user_use_case);
 
         let provider_id = ProviderId::new("unknown");
 
@@ -74,7 +76,8 @@ mod tests {
         let mut providers: HashMap<ProviderId, Arc<dyn Provider>> = HashMap::new();
         providers.insert(ProviderId::new("known"), Arc::new(MockProvider {}));
 
-        let sut = AuthenticationService::new(providers);
+        let get_user_use_case = Arc::new(MockGetUserUseCase::new());
+        let sut = AuthenticationService::new(providers, get_user_use_case);
 
         let provider_id = ProviderId::new("known");
 

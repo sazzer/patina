@@ -1,10 +1,15 @@
 use async_trait::async_trait;
+#[cfg(test)]
+use mockall::predicate::*;
+#[cfg(test)]
+use mockall::*;
 
 use super::{AuthenticationId, AuthenticationService, UserID, UserResource};
 
 /// Use case for getting a user by ID.
+#[cfg_attr(test, automock)]
 #[async_trait]
-pub trait GetUserUseCase {
+pub trait GetUserUseCase: Send + Sync {
     /// Get the user with the given ID.
     ///
     /// # Parameters

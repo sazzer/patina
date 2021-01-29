@@ -42,7 +42,7 @@ pub async fn complete(
 
     // Actually complete authentication
     let _authenticated_user = authentication_service
-        .complete_authentication(&ProviderId::new(&path.0), &authentication_nonce, params.0)
+        .complete_authentication(ProviderId::new(&path.0), &authentication_nonce, params.0)
         .await?;
 
     Err(Problem::from(NOT_FOUND).with_extra("why", "Success"))

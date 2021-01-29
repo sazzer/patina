@@ -13,13 +13,13 @@ impl CompleteAuthenticationUseCase for AuthenticationService {
     #[tracing::instrument(skip(self))]
     async fn complete_authentication(
         &self,
-        provider_id: &ProviderId,
+        provider_id: ProviderId,
         nonce: &str,
         params: HashMap<String, String>,
     ) -> Result<UserResource, CompleteAuthenticationError> {
         let provider = self
             .providers
-            .get(provider_id)
+            .get(&provider_id)
             .ok_or(CompleteAuthenticationError::UnknownProvider)?;
 
         let _authenticated_user = provider.complete_authentication(nonce, params).await;

@@ -9,7 +9,7 @@ use crate::{database::Database, server::Configurer};
 
 /// Configuration component for working with users.
 pub struct Component {
-    service: Arc<UsersService>,
+    pub service: Arc<UsersService>,
 }
 
 /// Construct a new users component.

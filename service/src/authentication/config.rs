@@ -19,10 +19,13 @@ pub struct Builder {
 
 impl Builder {
     /// Build the authentication component.
-    pub fn build(self) -> Arc<Component> {
+    pub fn build(self, users_component: &Arc<crate::users::config::Component>) -> Arc<Component> {
         tracing::debug!("Built authentication service");
 
-        let service = Arc::new(AuthenticationService::new(self.providers));
+        let service = Arc::new(AuthenticationService::new(
+            self.providers,
+            users_component.service.clone(),
+        ));
         Arc::new(Component { service })
     }
 }

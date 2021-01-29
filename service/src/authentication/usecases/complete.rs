@@ -18,7 +18,7 @@ pub trait CompleteAuthenticationUseCase {
     /// The details of the user that has just authenticated.
     async fn complete_authentication(
         &self,
-        provider: &ProviderId,
+        provider: ProviderId,
         nonce: &str,
         params: HashMap<String, String>,
     ) -> Result<UserResource, CompleteAuthenticationError>;

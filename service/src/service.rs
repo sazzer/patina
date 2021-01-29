@@ -29,7 +29,7 @@ impl Service {
         let users = crate::users::config::new(database.clone());
         let authentication = crate::authentication::config::builder()
             .with_google(&settings.google)
-            .build();
+            .build(&users);
         let health = crate::health::config::builder()
             .with_component("db", database)
             .build(&prometheus);
