@@ -1,8 +1,13 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
+#[cfg(test)]
+use mockall::predicate::*;
+#[cfg(test)]
+use mockall::*;
 
 /// Trait that other components can implement if they can check their health.
+#[cfg_attr(test, automock)]
 #[async_trait]
 pub trait HealthCheckable: Send + Sync {
     /// Check the health of the component.

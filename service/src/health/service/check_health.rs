@@ -53,16 +53,7 @@ mod tests {
     use prometheus::{proto::MetricFamily, Registry};
 
     use super::*;
-    use crate::health::HealthCheckable;
-
-    struct MockComponent(Result<(), String>);
-
-    #[async_trait]
-    impl HealthCheckable for MockComponent {
-        async fn check_health(&self) -> Result<(), String> {
-            self.0.clone()
-        }
-    }
+    use crate::health::{HealthCheckable, MockHealthCheckable};
 
     #[actix_rt::test]
     async fn health_service_given_no_components_then_is_healthy() {
@@ -79,7 +70,8 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_healthy_components_then_is_healthy() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert("healthy".to_string(), Arc::new(MockComponent(Ok(()))));
+        components.insert("healthy".to_string(), healthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -93,10 +85,8 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_unhealthy_components_then_is_unhealthy() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert(
-            "unhealthy".to_string(),
-            Arc::new(MockComponent(Err("Oops".to_string()))),
-        );
+        components.insert("unhealthy".to_string(), unhealthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -110,11 +100,9 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_mixed_components_then_is_unhealthy() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert("healthy".to_string(), Arc::new(MockComponent(Ok(()))));
-        components.insert(
-            "unhealthy".to_string(),
-            Arc::new(MockComponent(Err("Oops".to_string()))),
-        );
+        components.insert("healthy".to_string(), healthy_component());
+        components.insert("unhealthy".to_string(), unhealthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -129,6 +117,7 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_no_components_then_metrics_recorded() {
         let components = HashMap::new();
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -145,7 +134,8 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_healthy_component_then_metrics_recorded() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert("healthy".to_string(), Arc::new(MockComponent(Ok(()))));
+        components.insert("healthy".to_string(), healthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -170,10 +160,8 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_unhealthy_component_then_metrics_recorded() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert(
-            "unhealthy".to_string(),
-            Arc::new(MockComponent(Err("Oops".to_string()))),
-        );
+        components.insert("unhealthy".to_string(), unhealthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -198,11 +186,9 @@ mod tests {
     #[actix_rt::test]
     async fn health_service_given_mixed_components_then_metrics_recorded() {
         let mut components: HashMap<String, Arc<dyn HealthCheckable>> = HashMap::new();
-        components.insert("healthy".to_string(), Arc::new(MockComponent(Ok(()))));
-        components.insert(
-            "unhealthy".to_string(),
-            Arc::new(MockComponent(Err("Oops".to_string()))),
-        );
+        components.insert("healthy".to_string(), healthy_component());
+        components.insert("unhealthy".to_string(), unhealthy_component());
+
         let registry = Registry::new();
         let service = HealthService::new(components, &registry);
 
@@ -234,6 +220,26 @@ mod tests {
             "health_components",
             &[("status", "healthy"), ("component", "unhealthy")],
         );
+    }
+
+    fn healthy_component() -> Arc<dyn HealthCheckable> {
+        let mut healthy_component = MockHealthCheckable::new();
+        healthy_component
+            .expect_check_health()
+            .times(1)
+            .return_const(Ok(()));
+
+        Arc::new(healthy_component) as Arc<dyn HealthCheckable>
+    }
+
+    fn unhealthy_component() -> Arc<dyn HealthCheckable> {
+        let mut unhealthy_component = MockHealthCheckable::new();
+        unhealthy_component
+            .expect_check_health()
+            .times(1)
+            .return_const(Err("Oops".to_string()));
+
+        Arc::new(unhealthy_component) as Arc<dyn HealthCheckable>
     }
 
     fn check_metric_counter_value(
