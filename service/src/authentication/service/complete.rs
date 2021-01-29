@@ -22,8 +22,29 @@ impl CompleteAuthenticationUseCase for AuthenticationService {
             .get(&provider_id)
             .ok_or(CompleteAuthenticationError::UnknownProvider)?;
 
-        let _authenticated_user = provider.complete_authentication(nonce, params).await;
+        let authenticated_user = provider
+            .complete_authentication(nonce, params)
+            .await
+            .map_err(|e| {
+                tracing::warn!(err = ?e, "Failed to authenticate with provider");
+                CompleteAuthenticationError::AuthentictionFailed
+            })?;
 
-        Err(CompleteAuthenticationError::Unexpected)
+        let authentication_service = provider_id.into();
+
+        let user = self
+            .get_user_user_case
+            .get_user_by_authentication(
+                authentication_service,
+                authenticated_user.authentication_id,
+            )
+            .await;
+
+        #[allow(clippy::option_if_let_else)] // TODO: For now
+        if let Some(user) = user {
+            Ok(user)
+        } else {
+            Err(CompleteAuthenticationError::Unexpected)
+        }
     }
 }

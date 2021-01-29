@@ -30,6 +30,9 @@ pub enum CompleteAuthenticationError {
     #[error("The requested provider was unknown")]
     UnknownProvider,
 
+    #[error("Authentication with the provider failed")]
+    AuthentictionFailed,
+
     #[error("An unexpected error occurred")]
     Unexpected,
 }

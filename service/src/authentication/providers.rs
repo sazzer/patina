@@ -40,13 +40,13 @@ pub trait Provider: Sync + Send {
 #[derive(Debug)]
 pub struct AuthenticatedUser {
     /// The ID of the user at the provider
-    authentication_id: AuthenticationId,
+    pub authentication_id: AuthenticationId,
     /// The display name of the authentication details
-    authentication_display_name: String,
+    pub authentication_display_name: String,
     /// The email address of the user
-    email: Email,
+    pub email: Email,
     /// The display name of the user
-    display_name: String,
+    pub display_name: String,
 }
 
 /// Errors that can occur when attempting to complete authentication
