@@ -6,11 +6,9 @@ use super::service::{access_token::AccessTokenService, security_context::Securit
 
 /// Configuration component for working with users.
 pub struct Component {
-    #[allow(dead_code)] // TODO: For now
-    security_context_service: Arc<SecurityContextService>,
+    pub security_context_service: Arc<SecurityContextService>,
 
-    #[allow(dead_code)] // TODO: For now
-    access_token_service: Arc<AccessTokenService>,
+    pub access_token_service: Arc<AccessTokenService>,
 }
 
 /// Construct a new authorization component.

@@ -14,14 +14,12 @@ pub struct GoogleProvider {
     /// Client ID to use for authentication with Google
     client_id:     String,
     /// Client Secret to use for authentication with Google
-    #[allow(dead_code)] // TODO: For now
     client_secret: String,
     /// URL to redirect the user back to after authenticating with Google
     redirect_url:  String,
     /// URL pattern to start authenticating with Google
     auth_url:      String,
     /// URL to call to get an access token from Google
-    #[allow(dead_code)] // TODO: For now
     token_url:     String,
 }
 
