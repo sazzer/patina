@@ -1,5 +1,6 @@
 use super::repository::Repository;
 
+mod create_user;
 mod get_user;
 
 /// Service for working with users.

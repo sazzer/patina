@@ -4,7 +4,7 @@ use mockall::predicate::*;
 #[cfg(test)]
 use mockall::*;
 
-use super::{AuthenticationId, AuthenticationService, UserID, UserResource};
+use super::{AuthenticationId, AuthenticationService, UserData, UserID, UserResource};
 
 /// Use case for getting a user by ID.
 #[cfg_attr(test, automock)]
@@ -32,4 +32,24 @@ pub trait GetUserUseCase: Send + Sync {
         authentication_service: AuthenticationService,
         authentication_id: AuthenticationId,
     ) -> Option<UserResource>;
+}
+
+#[derive(Debug, PartialEq, thiserror::Error)]
+pub enum CreateUserError {
+    #[error("An unexpected error occurred")]
+    Unexpected,
+}
+
+/// Use case for creating a new user.
+#[cfg_attr(test, automock)]
+#[async_trait]
+pub trait CreateUserUseCase: Send + Sync {
+    /// Create a new user with the provided user data.
+    ///
+    /// # Parameters
+    /// - `user` - The data of the user to create
+    ///
+    /// # Returns
+    /// The newly created user, or else a reason why it couldn't be created.
+    async fn create_user(&self, user: UserData) -> Result<UserResource, CreateUserError>;
 }

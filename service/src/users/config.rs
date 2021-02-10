@@ -3,7 +3,8 @@ use std::sync::Arc;
 use actix_web::web::ServiceConfig;
 
 use super::{
-    endpoints::configure_server, repository::Repository, service::UsersService, GetUserUseCase,
+    endpoints::configure_server, repository::Repository, service::UsersService, CreateUserUseCase,
+    GetUserUseCase,
 };
 use crate::{database::Database, server::Configurer};
 
@@ -26,6 +27,7 @@ pub fn new(database: Arc<Database>) -> Arc<Component> {
 impl Configurer for Component {
     fn configure_server(&self, config: &mut ServiceConfig) {
         config.data(self.service.clone() as Arc<dyn GetUserUseCase>);
+        config.data(self.service.clone() as Arc<dyn CreateUserUseCase>);
 
         configure_server(config);
     }
